@@ -691,7 +691,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   max-width: 680px;
   margin: 0 auto 3rem;
 }
-@media(max-width:600px){ .pricing-grid { grid-template-columns: 1fr; } }
+@media(max-width:800px){ .pricing-grid { grid-template-columns: 1fr; } }
 
 .price-card {
   background: var(--surface);
@@ -1392,38 +1392,92 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <!-- Pricing -->
-    <div style="margin-top:3.5rem;text-align:center">
+    <div style="margin-top:3.5rem;text-align:center" id="pricing">
       <h3 style="font-family:var(--f-display);font-size:1.6rem;font-weight:800;color:var(--t1);margin-bottom:0.3rem">
         Simple, Fair Pricing
       </h3>
-      <p style="color:var(--t2);font-size:0.85rem;margin-bottom:2rem">Start free. Upgrade when you need every tool.</p>
-      <div class="pricing-grid">
+      <p style="color:var(--t2);font-size:0.85rem;margin-bottom:2rem">Built for independent truckers. No contracts. Cancel anytime.</p>
+      <div class="pricing-grid" style="grid-template-columns:repeat(3,1fr);max-width:960px">
         <div class="price-card">
-          <div class="price-tier">Free</div>
-          <div class="price-amount">$0</div>
-          <div class="price-period">Forever free · No credit card</div>
+          <div class="price-tier">Basic</div>
+          <div class="price-amount">$47<span style="font-size:1rem;color:var(--t3)">/mo</span></div>
+          <div class="price-period">Solo driver · 1 truck</div>
           <ul class="price-features">
-            <li>✓ 4 core calculators</li>
-            <li>✓ Works offline</li>
-            <li>✓ Local data only</li>
-            <li class="off">✗ Load Profit Analyzer</li>
-            <li class="off">✗ Tax Estimator</li>
+            <li>✓ All 8 calculators</li>
+            <li>✓ Load history tracker</li>
+            <li>✓ Offline PWA</li>
+            <li>✓ Settings sync</li>
+            <li class="off">✗ Multi-truck dashboard</li>
+            <li class="off">✗ IFTA report export</li>
           </ul>
-          <button class="btn-ghost" style="width:100%">Get Started Free</button>
+          <button class="btn-ghost" style="width:100%" onclick="alert('Stripe integration coming soon — contact us to get started!')">Get Basic</button>
         </div>
         <div class="price-card pro">
-          <div class="price-tier">Pro</div>
-          <div class="price-amount">$19<span style="font-size:1rem;color:var(--t3)">/mo</span></div>
-          <div class="price-period">Or $149/year — save 34%</div>
+          <div class="price-tier">Pro ⚡ Most Popular</div>
+          <div class="price-amount">$97<span style="font-size:1rem;color:var(--t3)">/mo</span></div>
+          <div class="price-period">Owner-operator · Up to 3 trucks</div>
           <ul class="price-features">
-            <li>✓ All 8 tools</li>
-            <li>✓ Load Profit Analyzer</li>
-            <li>✓ Tax Estimator (O/O)</li>
-            <li>✓ Truck Loan Calc</li>
-            <li>✓ Annual Projection</li>
+            <li>✓ Everything in Basic</li>
+            <li>✓ Multi-truck dashboard</li>
+            <li>✓ IFTA report export</li>
+            <li>✓ Tax estimator (O/O)</li>
+            <li>✓ Annual profit projector</li>
+            <li>✓ Priority support</li>
           </ul>
-          <button class="btn-primary" style="width:100%">⚡ Start Pro Trial</button>
+          <button class="btn-primary" style="width:100%" onclick="alert('Stripe integration coming soon — contact us to get started!')">⚡ Start Pro Trial</button>
         </div>
+        <div class="price-card" style="border-color:var(--blue);background:linear-gradient(160deg,var(--raised),var(--surface))">
+          <div class="price-tier" style="color:var(--blue)">Premium</div>
+          <div class="price-amount" style="color:var(--blue)">$197<span style="font-size:1rem;color:var(--t3)">/mo</span></div>
+          <div class="price-period">Fleet · Unlimited trucks</div>
+          <ul class="price-features">
+            <li>✓ Everything in Pro</li>
+            <li>✓ Unlimited trucks</li>
+            <li>✓ Driver accounts</li>
+            <li>✓ Fleet P&amp;L reporting</li>
+            <li>✓ API access</li>
+            <li>✓ Dedicated support</li>
+          </ul>
+          <button class="btn-ghost" style="width:100%;border-color:var(--blue);color:var(--blue)" onclick="alert('Stripe integration coming soon — contact us to get started!')">Contact for Fleet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact / Signup Form -->
+    <div style="margin-top:3.5rem;max-width:520px;margin-left:auto;margin-right:auto" id="contact">
+      <h3 style="font-family:var(--f-display);font-size:1.4rem;font-weight:800;color:var(--t1);text-align:center;margin-bottom:0.3rem">
+        Get Early Access
+      </h3>
+      <p style="text-align:center;color:var(--t2);font-size:0.85rem;margin-bottom:1.5rem">
+        Tell us about your operation and we'll reach out with a custom quote.
+      </p>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="contact-name" placeholder="John Smith"/>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="contact-email" placeholder="john@example.com"/>
+          </div>
+          <div class="form-group">
+            <label>Company / Authority Name</label>
+            <input type="text" id="contact-company" placeholder="Smith Trucking LLC"/>
+          </div>
+          <div class="form-group">
+            <label>Number of Trucks</label>
+            <select id="contact-trucks">
+              <option value="">Select...</option>
+              <option>1 (Solo driver)</option>
+              <option>2–3 trucks</option>
+              <option>4–10 trucks</option>
+              <option>11+ trucks</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="submitContact()">🚛 Send My Info</button>
+        <div class="result-box" id="contact-result" style="margin-top:1rem"></div>
       </div>
     </div>
 
@@ -1931,6 +1985,33 @@ function calcTripProfit() {
     ['Profit Margin',   margin.toFixed(1) + '%',    'highlight'],
     ['Net Per Mile',    '$' + netPerMile.toFixed(2),''],
   ]));
+}
+
+/* ── Contact Form ───────────────────────────────── */
+function submitContact() {
+  const name    = $('contact-name').value.trim();
+  const email   = $('contact-email').value.trim();
+  const company = $('contact-company').value.trim();
+  const trucks  = $('contact-trucks').value;
+
+  if (!name || !email) {
+    showResult('contact-result', 'Please enter your name and email.', 'error');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showResult('contact-result', 'Please enter a valid email address.', 'error');
+    return;
+  }
+
+  // Save submission locally (Stripe/CRM integration goes here)
+  const leads = JSON.parse(localStorage.getItem('rigops-leads') || '[]');
+  leads.push({ name, email, company, trucks, ts: new Date().toISOString() });
+  localStorage.setItem('rigops-leads', JSON.stringify(leads));
+
+  showResult('contact-result',
+    `<div class="result-item green-item"><span>Submitted!</span><strong>We'll be in touch soon, ${name}.</strong></div>`
+  );
+  ['contact-name','contact-email','contact-company','contact-trucks'].forEach(id => $(id).value = '');
 }
 
 /* ── Settings Persistence ───────────────────────── */

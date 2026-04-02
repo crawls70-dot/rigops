@@ -11,6 +11,42 @@
       overflow-x: hidden;
     }
 
+    /* ── Button System (design-system fallback) ──────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      font-family: var(--f-display);
+      font-weight: 600;
+      letter-spacing: .04em;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      white-space: nowrap;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: #06080D;
+      box-shadow: 0 4px 20px var(--gold-dim);
+    }
+    .btn-primary:hover {
+      background: #FFB700;
+      box-shadow: 0 4px 28px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--t1);
+      border: 1px solid var(--b2);
+    }
+    .btn-ghost:hover { border-color: var(--b3); background: var(--raised); }
+    .btn-sm  { padding: .38rem 1rem; font-size: .82rem; }
+    .btn-lg  { padding: .8rem 2rem;  font-size: 1.05rem; }
+    .btn:not(.btn-sm):not(.btn-lg) { padding: .6rem 1.4rem; font-size: .92rem; }
+
     /* ── Hero ─────────────────────────────────────────── */
     .hero {
       min-height: 100vh;

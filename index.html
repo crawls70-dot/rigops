@@ -1933,6 +1933,49 @@ function calcTripProfit() {
   ]));
 }
 
+/* ── Settings Persistence ───────────────────────── */
+const SETTINGS_KEY = 'rigops-settings';
+
+// Fields whose values persist across sessions (driver profile / preferences)
+const PERSIST_FIELDS = [
+  'fuel-mpg','fuel-price',           // CC fuel calc
+  'tc-mpg','tc-fuel',                // CC trip cost
+  'cpm-weeks',                       // CC CPM weeks/year
+  'oo-truck','oo-ins','oo-maint',    // CC O/O monthly costs
+  'dt-fuel-mpg','dt-fuel-price',     // DT fuel calc
+  'dt-cpm-truck','dt-cpm-ins','dt-cpm-maint','dt-cpm-ifta', // DT CPM monthly costs
+  'tp-mpg','tp-fuel-price',          // DT trip profit
+  'be-fixed','be-vcpm',              // DT break-even fixed costs
+];
+
+function saveSettings() {
+  const settings = {};
+  PERSIST_FIELDS.forEach(id => {
+    const el = $(id);
+    if (el && el.value !== '') settings[id] = el.value;
+  });
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function loadSettings() {
+  try {
+    const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    PERSIST_FIELDS.forEach(id => {
+      const el = $(id);
+      if (el && settings[id] !== undefined) el.value = settings[id];
+    });
+  } catch(e) {}
+}
+
+// Auto-save settings whenever a persisted field changes
+window.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  PERSIST_FIELDS.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', saveSettings);
+  });
+});
+
 /* ── PWA Service Worker ─────────────────────────── */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

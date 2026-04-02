@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RigOps — Truck Driver Command Center</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Top Header Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-icon">🚛</div>
+        <div class="brand-text">
+          <span class="brand-name">RigOps</span>
+          <span class="brand-sub">Command Center</span>
+        </div>
+      </div>
+      <div class="top-stats">
+        <div class="stat-pill" id="live-time">--:-- --</div>
+        <div class="stat-pill" id="live-date">--- --, ----</div>
+        <div class="stat-pill status-online">● ONLINE</div>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-tab="dashboard">
+        <span class="nav-icon">⬡</span> Dashboard
+      </button>
+      <button class="nav-btn" data-tab="dat-board">
+        <span class="nav-icon">📋</span> DAT Board
+      </button>
+      <button class="nav-btn" data-tab="trip-tools">
+        <span class="nav-icon">🗺️</span> Trip Tools
+      </button>
+      <button class="nav-btn" data-tab="pay-calculator">
+        <span class="nav-icon">💰</span> Pay Calculator
+      </button>
+      <button class="nav-btn" data-tab="load-planner">
+        <span class="nav-icon">📦</span> Load Planner
+      </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content-area">
+
+      <!-- ===== DASHBOARD TAB ===== -->
+      <section class="tab-section active" id="tab-dashboard">
+        <div class="section-header">
+          <h2>Dashboard Overview</h2>
+          <p>Your real-time command center — all tools at a glance.</p>
+        </div>
+        <div class="dashboard-grid">
+          <div class="dash-card card-highlight">
+            <div class="card-icon">⛽</div>
+            <div class="card-body">
+              <h3>Fuel Calculator</h3>
+              <p>Calculate fuel cost for any trip with MPG and price per gallon.</p>
+              <button class="card-btn" onclick="switchTab('trip-tools', 'fuel')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="card-icon">🧾</div>
+            <div class="card-body">
+              <h3>Trip Cost Calculator</h3>
+              <p>Total trip expenses including fuel, tolls, food & overnight.</p>
+              <button class="card-btn" onclick="switchTab('trip-tools', 'tripcost')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="card-icon">💵</div>
+            <div class="card-body">
+              <h3>CPM Pay Calculator</h3>
+              <p>Cents-per-mile earnings calculator for company drivers.</p>
+              <button class="card-btn" onclick="switchTab('pay-calculator', 'cpm')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="card-icon">🏢</div>
+            <div class="card-body">
+              <h3>Owner Operator Net</h3>
+              <p>Calculate true net profit after all O/O expenses.</p>
+              <button class="card-btn" onclick="switchTab('pay-calculator', 'oo')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="card-icon">⚖️</div>
+            <div class="card-body">
+              <h3>Axle Weight Calculator</h3>
+              <p>Distribute load weight across axles to stay legal.</p>
+              <button class="card-btn" onclick="switchTab('load-planner', 'axle')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="card-icon">📏</div>
+            <div class="card-body">
+              <h3>Max Payload Finder</h3>
+              <p>Find maximum legal payload based on truck configuration.</p>
+              <button class="card-btn" onclick="switchTab('load-planner', 'payload')">Open Tool →</button>
+            </div>
+          </div>
+          <div class="dash-card card-wide">
+            <div class="card-icon">🕐</div>
+            <div class="card-body">
+              <h3>HOS Log Tracker</h3>
+              <p>Track Hours of Service — 11-hour drive, 14-hour window, 70-hour cycle.</p>
+              <button class="card-btn" onclick="switchTab('trip-tools', 'hos')">Open HOS Tracker →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== DAT BOARD TAB ===== -->
+      <section class="tab-section" id="tab-dat-board">
+        <div class="section-header">
+          <h2>DAT Load Board</h2>
+          <p>Browse available loads and calculate rate-per-mile profitability.</p>
+        </div>
+        <div class="tool-panel">
+          <div class="tool-row">
+            <div class="form-group">
+              <label>Origin City</label>
+              <input type="text" id="dat-origin" placeholder="e.g. Dallas, TX" />
+            </div>
+            <div class="form-group">
+              <label>Destination City</label>
+              <input type="text" id="dat-dest" placeholder="e.g. Atlanta, GA" />
+            </div>
+            <div class="form-group">
+              <label>Load Type</label>
+              <select id="dat-type">
+                <option>Dry Van</option>
+                <option>Reefer</option>
+                <option>Flatbed</option>
+                <option>Step Deck</option>
+                <option>Tanker</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Miles (est.)</label>
+              <input type="number" id="dat-miles" placeholder="e.g. 1250" />
+            </div>
+            <div class="form-group">
+              <label>Rate Offered ($)</label>
+              <input type="number" id="dat-rate" placeholder="e.g. 2500" />
+            </div>
+          </div>
+          <button class="primary-btn" onclick="calcDat()">Analyze Load</button>
+          <div class="result-box" id="dat-result"></div>
+        </div>
+        <div class="tool-panel" style="margin-top:2rem;">
+          <h3 style="color:var(--accent);margin-bottom:1rem;">Sample Load Board Listings</h3>
+          <div class="load-board-table">
+            <div class="lb-header">
+              <span>Origin</span><span>Destination</span><span>Type</span><span>Miles</span><span>Rate</span><span>RPM</span>
+            </div>
+            <div class="lb-row"><span>Chicago, IL</span><span>Nashville, TN</span><span>Dry Van</span><span>476</span><span>$1,150</span><span class="rpm-good">$2.42</span></div>
+            <div class="lb-row"><span>Houston, TX</span><span>Los Angeles, CA</span><span>Reefer</span><span>1,553</span><span>$4,200</span><span class="rpm-good">$2.70</span></div>
+            <div class="lb-row"><span>Atlanta, GA</span><span>Miami, FL</span><span>Flatbed</span><span>662</span><span>$1,450</span><span class="rpm-ok">$2.19</span></div>
+            <div class="lb-row"><span>Denver, CO</span><span>Phoenix, AZ</span><span>Dry Van</span><span>601</span><span>$1,100</span><span class="rpm-low">$1.83</span></div>
+            <div class="lb-row"><span>Seattle, WA</span><span>Salt Lake City, UT</span><span>Reefer</span><span>835</span><span>$2,600</span><span class="rpm-good">$3.11</span></div>
+            <div class="lb-row"><span>Memphis, TN</span><span>Dallas, TX</span><span>Step Deck</span><span>445</span><span>$1,050</span><span class="rpm-ok">$2.36</span></div>
+          </div>
+          <div class="legend"><span class="rpm-good">■ $2.50+</span> <span class="rpm-ok">■ $2.00–2.49</span> <span class="rpm-low">■ Under $2.00</span></div>
+        </div>
+      </section>
+
+      <!-- ===== TRIP TOOLS TAB ===== -->
+      <section class="tab-section" id="tab-trip-tools">
+        <div class="section-header">
+          <h2>Trip Tools</h2>
+          <p>Fuel, trip cost, and HOS management tools.</p>
+        </div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="fuel" onclick="switchSubTab('trip-tools','fuel',this)">⛽ Fuel Calc</button>
+          <button class="sub-tab" data-subtab="tripcost" onclick="switchSubTab('trip-tools','tripcost',this)">🧾 Trip Cost</button>
+          <button class="sub-tab" data-subtab="hos" onclick="switchSubTab('trip-tools','hos',this)">🕐 HOS Tracker</button>
+        </div>
+
+        <!-- Fuel Calculator -->
+        <div class="subtab-content active" id="fuel-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">⛽ Fuel Cost Calculator</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Trip Distance (miles)</label>
+                <input type="number" id="fuel-miles" placeholder="e.g. 1500" />
+              </div>
+              <div class="form-group">
+                <label>Truck MPG</label>
+                <input type="number" id="fuel-mpg" placeholder="e.g. 6.5" step="0.1" />
+              </div>
+              <div class="form-group">
+                <label>Price per Gallon ($)</label>
+                <input type="number" id="fuel-price" placeholder="e.g. 3.85" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label>DEF Cost per Mile (¢)</label>
+                <input type="number" id="fuel-def" placeholder="e.g. 2" step="0.1" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcFuel()">Calculate Fuel Cost</button>
+            <div class="result-box" id="fuel-result"></div>
+          </div>
+        </div>
+
+        <!-- Trip Cost Calculator -->
+        <div class="subtab-content" id="tripcost-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">🧾 Full Trip Cost Calculator</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Trip Miles</label>
+                <input type="number" id="tc-miles" placeholder="1500" />
+              </div>
+              <div class="form-group">
+                <label>MPG</label>
+                <input type="number" id="tc-mpg" placeholder="6.5" step="0.1" />
+              </div>
+              <div class="form-group">
+                <label>Fuel Price ($/gal)</label>
+                <input type="number" id="tc-fuel" placeholder="3.85" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label>Toll Costs ($)</label>
+                <input type="number" id="tc-tolls" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Food / Per Diem ($)</label>
+                <input type="number" id="tc-food" placeholder="50" />
+              </div>
+              <div class="form-group">
+                <label>Hotel / Overnight ($)</label>
+                <input type="number" id="tc-hotel" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Misc / Other ($)</label>
+                <input type="number" id="tc-misc" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Load Rate ($)</label>
+                <input type="number" id="tc-rate" placeholder="2500" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcTripCost()">Calculate Total Trip Cost</button>
+            <div class="result-box" id="tripcost-result"></div>
+          </div>
+        </div>
+
+        <!-- HOS Tracker -->
+        <div class="subtab-content" id="hos-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">🕐 HOS Log Tracker (11/14/70 Rule)</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Hours Driven Today</label>
+                <input type="number" id="hos-drive" placeholder="0" step="0.5" max="11" />
+              </div>
+              <div class="form-group">
+                <label>Hours On-Duty (non-driving)</label>
+                <input type="number" id="hos-onduty" placeholder="0" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label>Hours Used This Week (70-hr cycle)</label>
+                <input type="number" id="hos-week" placeholder="0" step="0.5" max="70" />
+              </div>
+              <div class="form-group">
+                <label>Hours Since Last 10-hr Break</label>
+                <input type="number" id="hos-since-break" placeholder="0" step="0.5" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcHOS()">Check HOS Status</button>
+            <div class="result-box" id="hos-result"></div>
+            <div class="hos-gauges" id="hos-gauges"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAY CALCULATOR TAB ===== -->
+      <section class="tab-section" id="tab-pay-calculator">
+        <div class="section-header">
+          <h2>Pay Calculator</h2>
+          <p>CPM earnings and Owner Operator net profit calculators.</p>
+        </div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="cpm" onclick="switchSubTab('pay-calculator','cpm',this)">💵 CPM Calculator</button>
+          <button class="sub-tab" data-subtab="oo" onclick="switchSubTab('pay-calculator','oo',this)">🏢 O/O Net Profit</button>
+        </div>
+
+        <!-- CPM Calculator -->
+        <div class="subtab-content active" id="cpm-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">💵 Cents Per Mile Pay Calculator</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Miles Driven (week)</label>
+                <input type="number" id="cpm-miles" placeholder="2500" />
+              </div>
+              <div class="form-group">
+                <label>CPM Rate (¢)</label>
+                <input type="number" id="cpm-rate" placeholder="55" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label>Accessorial Pay ($)</label>
+                <input type="number" id="cpm-acc" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Detention Pay ($)</label>
+                <input type="number" id="cpm-det" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Weeks per Year</label>
+                <input type="number" id="cpm-weeks" placeholder="50" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcCPM()">Calculate Earnings</button>
+            <div class="result-box" id="cpm-result"></div>
+          </div>
+        </div>
+
+        <!-- Owner Operator Net -->
+        <div class="subtab-content" id="oo-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">🏢 Owner Operator Net Profit Calculator</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Gross Revenue ($)</label>
+                <input type="number" id="oo-gross" placeholder="12000" />
+              </div>
+              <div class="form-group">
+                <label>Fuel Cost ($)</label>
+                <input type="number" id="oo-fuel" placeholder="3500" />
+              </div>
+              <div class="form-group">
+                <label>Truck Payment ($)</label>
+                <input type="number" id="oo-truck" placeholder="1200" />
+              </div>
+              <div class="form-group">
+                <label>Insurance ($)</label>
+                <input type="number" id="oo-ins" placeholder="900" />
+              </div>
+              <div class="form-group">
+                <label>Dispatcher / Broker Fee ($)</label>
+                <input type="number" id="oo-broker" placeholder="0" />
+              </div>
+              <div class="form-group">
+                <label>Maintenance / Repairs ($)</label>
+                <input type="number" id="oo-maint" placeholder="400" />
+              </div>
+              <div class="form-group">
+                <label>Permits / IFTA / Taxes ($)</label>
+                <input type="number" id="oo-tax" placeholder="300" />
+              </div>
+              <div class="form-group">
+                <label>Food / Per Diem ($)</label>
+                <input type="number" id="oo-food" placeholder="200" />
+              </div>
+              <div class="form-group">
+                <label>Other Expenses ($)</label>
+                <input type="number" id="oo-other" placeholder="0" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcOO()">Calculate Net Profit</button>
+            <div class="result-box" id="oo-result"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== LOAD PLANNER TAB ===== -->
+      <section class="tab-section" id="tab-load-planner">
+        <div class="section-header">
+          <h2>Load Planner</h2>
+          <p>Axle weight distribution and maximum payload tools.</p>
+        </div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subtab="axle" onclick="switchSubTab('load-planner','axle',this)">⚖️ Axle Weight</button>
+          <button class="sub-tab" data-subtab="payload" onclick="switchSubTab('load-planner','payload',this)">📏 Max Payload</button>
+        </div>
+
+        <!-- Axle Weight Calculator -->
+        <div class="subtab-content active" id="axle-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">⚖️ Axle Weight Distribution Calculator</h3>
+            <p class="tool-desc">Federal limits: Steer 12,000 lbs | Drive tandem 34,000 lbs | Trailer tandem 34,000 lbs | Gross 80,000 lbs</p>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Steer Axle Weight (lbs)</label>
+                <input type="number" id="axle-steer" placeholder="11000" />
+              </div>
+              <div class="form-group">
+                <label>Drive Tandem Weight (lbs)</label>
+                <input type="number" id="axle-drive" placeholder="32000" />
+              </div>
+              <div class="form-group">
+                <label>Trailer Tandem Weight (lbs)</label>
+                <input type="number" id="axle-trailer" placeholder="32000" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcAxle()">Check Axle Weights</button>
+            <div class="result-box" id="axle-result"></div>
+          </div>
+        </div>
+
+        <!-- Max Payload -->
+        <div class="subtab-content" id="payload-content">
+          <div class="tool-panel">
+            <h3 class="tool-title">📏 Maximum Payload Finder</h3>
+            <div class="tool-row">
+              <div class="form-group">
+                <label>Truck Tare Weight (lbs)</label>
+                <input type="number" id="pay-truck" placeholder="e.g. 16000" />
+              </div>
+              <div class="form-group">
+                <label>Trailer Tare Weight (lbs)</label>
+                <input type="number" id="pay-trailer" placeholder="e.g. 14000" />
+              </div>
+              <div class="form-group">
+                <label>Fuel Weight (lbs)</label>
+                <input type="number" id="pay-fuel" placeholder="e.g. 1500" />
+              </div>
+              <div class="form-group">
+                <label>Driver + Gear (lbs)</label>
+                <input type="number" id="pay-driver" placeholder="e.g. 300" />
+              </div>
+              <div class="form-group">
+                <label>Legal Gross Weight Limit (lbs)</label>
+                <input type="number" id="pay-gross" placeholder="80000" />
+              </div>
+            </div>
+            <button class="primary-btn" onclick="calcPayload()">Find Max Payload</button>
+            <div class="result-box" id="payload-result"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-footer">
+      <span>RigOps Command Center</span>
+      <span>Built for the Road</span>
+      <span id="footer-year"></span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

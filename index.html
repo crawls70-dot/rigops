@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RigOps — Unified Driver Platform</title>
+  <meta name="description" content="The complete operating system for truck drivers and owner-operators."/>
+  <meta name="theme-color" content="#F0A500"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="RigOps"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  --bg:        #06080D;
+  --surface:   #0D1018;
+  --raised:    #131824;
+  --card:      #181D2A;
+  --b0:        rgba(255,255,255,0.025);
+  --b1:        rgba(255,255,255,0.07);
+  --b2:        rgba(255,255,255,0.12);
+  --b3:        rgba(255,255,255,0.22);
+  --gold:      #F0A500;
+  --gold-glow: rgba(240,165,0,0.22);
+  --gold-dim:  rgba(240,165,0,0.08);
+  --green:     #22C55E;
+  --green-dim: rgba(34,197,94,0.10);
+  --red:       #EF4444;
+  --red-dim:   rgba(239,68,68,0.10);
+  --blue:      #3B82F6;
+  --t1:        #E8EDF5;
+  --t2:        #6B7A90;
+  --t3:        #3A4558;
+  --r:         6px;
+  --r-lg:      10px;
+  --r-xl:      14px;
+  --f-display: 'Rajdhani', sans-serif;
+  --f-body:    'Barlow', sans-serif;
+  --f-mono:    'Share Tech Mono', monospace;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--f-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grid background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--b0) 1px, transparent 1px),
+    linear-gradient(90deg, var(--b0) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient gold glow top-center */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 500px;
+  background: radial-gradient(ellipse, rgba(240,165,0,.06) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+input, select, button, textarea { font-family: inherit; }
+input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+a { color: inherit; text-decoration: none; }
+
+/* ═══════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(6,8,13,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 56px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.logo-mark {
+  width: 34px; height: 34px;
+  background: var(--gold);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 0 16px var(--gold-glow);
+  flex-shrink: 0;
+}
+.logo-name {
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: 0.02em;
+}
+.logo-name span { color: var(--gold); }
+.logo-badge {
+  font-family: var(--f-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--t3);
+  border: 1px solid var(--b2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.live-clock {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--t2);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ═══════════════════════════════════════════════════════
+   TOP NAVIGATION TABS
+═══════════════════════════════════════════════════════ */
+.top-nav {
+  position: sticky;
+  top: 56px;
+  z-index: 190;
+  background: rgba(6,8,13,0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 1.5rem;
+  overflow-x: auto;
+}
+.top-nav::-webkit-scrollbar { display: none; }
+
+.top-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 1.2rem;
+  height: 44px;
+  font-family: var(--f-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--t2);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.top-tab:hover { color: var(--t1); }
+.top-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.top-tab .tab-icon { font-size: 1rem; }
+
+/* ═══════════════════════════════════════════════════════
+   MAIN CONTENT WRAPPER
+═══════════════════════════════════════════════════════ */
+.main-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════════════════ */
+.section-head {
+  margin-bottom: 1.8rem;
+}
+.section-head h2 {
+  font-family: var(--f-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 0.2rem;
+}
+.section-head p {
+  color: var(--t2);
+  font-size: 0.85rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STAT CARDS ROW
+═══════════════════════════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+@media(max-width:900px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:500px){ .stats-row { grid-template-columns: 1fr; } }
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--b2); }
+.stat-label {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--t3);
+}
+.stat-value {
+  font-family: var(--f-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1;
+}
+.stat-value.green { color: var(--green); }
+.stat-value.red   { color: var(--red); }
+.stat-value.gold  { color: var(--gold); }
+.stat-sub {
+  font-size: 0.72rem;
+  color: var(--t2);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FORM COMPONENTS
+═══════════════════════════════════════════════════════ */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.form-card-title {
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--t1);
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.form-grid-wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group label {
+  font-size: 0.72rem;
+  color: var(--t2);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.form-group input,
+.form-group select {
+  background: var(--raised);
+  border: 1px solid var(--b2);
+  border-radius: var(--r);
+  padding: 0.6rem 0.8rem;
+  color: var(--t1);
+  font-size: 0.88rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+.form-group select { cursor: pointer; }
+.form-group select option { background: var(--raised); color: var(--t1); }
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn-primary {
+  background: var(--gold);
+  color: #06080D;
+  border: none;
+  border-radius: var(--r);
+  padding: 0.65rem 1.4rem;
+  font-family: var(--f-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px var(--gold-dim);
+}
+.btn-primary:hover {
+  background: #FFB700;
+  box-shadow: 0 4px 28px var(--gold-glow);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--t1);
+  border: 1px solid var(--b2);
+  border-radius: var(--r);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--b3); background: var(--raised); }
+
+.btn-danger {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--r);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+/* ═══════════════════════════════════════════════════════
+   RESULT BOX
+═══════════════════════════════════════════════════════ */
+.result-box {
+  margin-top: 1.2rem;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.result-box:empty { display: none; }
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--b1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.result-item {
+  background: var(--raised);
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.result-item span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--t2);
+}
+.result-item strong {
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--t1);
+}
+.result-item.highlight { background: var(--gold-dim); }
+.result-item.highlight strong { color: var(--gold); }
+.result-item.green-item { background: var(--green-dim); }
+.result-item.green-item strong { color: var(--green); }
+.result-item.red-item { background: var(--red-dim); }
+.result-item.red-item strong { color: var(--red); }
+
+.result-error {
+  background: var(--red-dim);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--r-lg);
+  padding: 0.8rem 1rem;
+  color: var(--red);
+  font-size: 0.85rem;
+}
+.result-warn {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-glow);
+  border-radius: var(--r-lg);
+  padding: 0.8rem 1rem;
+  color: var(--gold);
+  font-size: 0.85rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUB TABS (Command Center inner nav)
+═══════════════════════════════════════════════════════ */
+.sub-nav {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.sub-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sub-tab:hover { color: var(--t1); border-color: var(--b2); }
+.sub-tab.active {
+  background: var(--gold-dim);
+  border-color: var(--gold-glow);
+  color: var(--gold);
+}
+
+.sub-panel { display: none; }
+.sub-panel.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD — LOAD TABLE
+═══════════════════════════════════════════════════════ */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.table-card-header {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-card-title {
+  font-family: var(--f-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--t1);
+}
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+thead th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--t3);
+  background: var(--raised);
+  border-bottom: 1px solid var(--b1);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--b0);
+  color: var(--t1);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.td-green { color: var(--green); font-weight: 600; }
+.td-red   { color: var(--red);   font-weight: 600; }
+.td-gold  { color: var(--gold);  font-weight: 600; }
+.empty-row td {
+  text-align: center;
+  color: var(--t3);
+  padding: 2.5rem;
+  font-size: 0.85rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   P&L CARDS GRID
+═══════════════════════════════════════════════════════ */
+.pnl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media(max-width:700px){ .pnl-grid { grid-template-columns: 1fr; } }
+
+.pnl-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pnl-icon { font-size: 1.6rem; }
+.pnl-label { font-size: 0.78rem; color: var(--t2); font-weight: 500; }
+.pnl-value {
+  font-family: var(--f-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--t1);
+}
+.pnl-value.green { color: var(--green); }
+.pnl-value.red   { color: var(--red); }
+.pnl-sub { font-size: 0.72rem; color: var(--t2); }
+
+/* ═══════════════════════════════════════════════════════
+   DAT BOARD — LOAD BOARD TABLE
+═══════════════════════════════════════════════════════ */
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.lb-table thead th {
+  background: var(--raised);
+  border-bottom: 1px solid var(--b1);
+  padding: 0.6rem 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--t3);
+  text-align: left;
+}
+.lb-table tbody td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--b0);
+  color: var(--t1);
+}
+.lb-table tbody tr:last-child td { border-bottom: none; }
+.lb-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.rpm-good  { color: var(--green); font-weight: 700; }
+.rpm-ok    { color: var(--gold);  font-weight: 700; }
+.rpm-low   { color: var(--red);   font-weight: 700; }
+
+.legend {
+  padding: 0.8rem 1rem;
+  font-size: 0.72rem;
+  color: var(--t2);
+  display: flex;
+  gap: 1.2rem;
+  border-top: 1px solid var(--b1);
+  font-family: var(--f-mono);
+}
+
+/* ═══════════════════════════════════════════════════════
+   HOS GAUGE BAR
+═══════════════════════════════════════════════════════ */
+.hos-gauge-item {
+  margin-top: 0.8rem;
+}
+.hos-gauge-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--t2);
+  margin-bottom: 0.3rem;
+}
+.hos-gauge-track {
+  height: 8px;
+  background: var(--raised);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--b1);
+}
+.hos-gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DRIVER TOOLS — FEATURE CARDS
+═══════════════════════════════════════════════════════ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  transition: all 0.2s;
+}
+.feature-card:hover {
+  border-color: var(--b2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+}
+.feature-icon-lg { font-size: 1.8rem; margin-bottom: 0.7rem; }
+.feature-title {
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 0.3rem;
+}
+.feature-desc {
+  font-size: 0.8rem;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRICING CARDS
+═══════════════════════════════════════════════════════ */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  max-width: 680px;
+  margin: 0 auto 3rem;
+}
+@media(max-width:600px){ .pricing-grid { grid-template-columns: 1fr; } }
+
+.price-card {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+  padding: 1.8rem;
+}
+.price-card.pro {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, var(--raised), var(--surface));
+  box-shadow: 0 0 40px var(--gold-dim);
+}
+.price-tier {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--t3);
+  margin-bottom: 0.5rem;
+}
+.price-card.pro .price-tier { color: var(--gold); }
+.price-amount {
+  font-family: var(--f-display);
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--t1);
+  margin-bottom: 0.15rem;
+  line-height: 1;
+}
+.price-card.pro .price-amount { color: var(--gold); }
+.price-period {
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  color: var(--t3);
+  margin-bottom: 1.2rem;
+}
+.price-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.82rem;
+  color: var(--t2);
+}
+.price-features li.off { color: var(--t3); }
+
+/* ═══════════════════════════════════════════════════════
+   TOOL PILLS (driver tools landing strip)
+═══════════════════════════════════════════════════════ */
+.pill-strip {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+.pill {
+  background: var(--surface);
+  border: 1px solid var(--b1);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  color: var(--t2);
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.pill.free { border-color: var(--b2); color: var(--t1); }
+.pill.pro  { background: var(--gold-dim); border-color: var(--gold-glow); color: var(--gold); }
+
+/* ═══════════════════════════════════════════════════════
+   HERO BANNER (driver tools top section)
+═══════════════════════════════════════════════════════ */
+.dt-hero {
+  text-align: center;
+  padding: 2rem 0 2.5rem;
+  margin-bottom: 2rem;
+}
+.dt-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-glow);
+  border-radius: 20px;
+  padding: 0.28rem 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+.dt-hero h2 {
+  font-family: var(--f-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--t1);
+  line-height: 1.08;
+  margin-bottom: 0.8rem;
+}
+.dt-hero h2 span { color: var(--gold); }
+.dt-hero p {
+  color: var(--t2);
+  max-width: 520px;
+  margin: 0 auto 1.8rem;
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--b1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--f-mono);
+  font-size: 0.63rem;
+  color: var(--t3);
+  letter-spacing: 0.06em;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media(max-width: 768px) {
+  .main-content { padding: 1.2rem 1rem 3rem; }
+  .header-right .live-clock span:last-child { display: none; }
+  .top-tab { padding: 0 0.85rem; font-size: 0.85rem; }
+}
+@media(max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .logo-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-mark">⬡</div>
+    <div class="logo-name">Rig<span>Ops</span></div>
+    <span class="logo-badge">Platform</span>
+  </div>
+  <div class="header-right">
+    <div class="live-clock">
+      <span class="live-dot"></span>
+      <span id="liveClock">--:-- --</span>
+      <span id="liveDate" style="color:var(--t3)"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     TOP NAVIGATION
+═══════════════════════════════════════════════════ -->
+<nav class="top-nav">
+  <button class="top-tab active" data-page="dashboard" onclick="switchPage('dashboard',this)">
+    <span class="tab-icon">📊</span> Dashboard
+  </button>
+  <button class="top-tab" data-page="command" onclick="switchPage('command',this)">
+    <span class="tab-icon">⬡</span> Command Center
+  </button>
+  <button class="top-tab" data-page="driver-tools" onclick="switchPage('driver-tools',this)">
+    <span class="tab-icon">🚛</span> Driver Tools
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════ -->
+<div class="main-content">
+
+  <!-- ══════════════════════════════════════════
+       PAGE: DASHBOARD
+  ══════════════════════════════════════════ -->
+  <section id="page-dashboard" class="page-section active">
+
+    <div class="section-head">
+      <h2>Operations Dashboard</h2>
+      <p>Track loads, revenue, expenses, and profitability in real time.</p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value gold" id="dash-revenue">$0</div>
+        <div class="stat-sub" id="dash-load-count">0 loads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Expenses</div>
+        <div class="stat-value red" id="dash-expenses">$0</div>
+        <div class="stat-sub">Operating costs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value green" id="dash-profit">$0</div>
+        <div class="stat-sub" id="dash-margin">0% margin</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Miles</div>
+        <div class="stat-value" id="dash-miles">0</div>
+        <div class="stat-sub" id="dash-rpm">$0.00 / mile</div>
+      </div>
+    </div>
+
+    <!-- Add Load Form -->
+    <div class="form-card">
+      <div class="form-card-title">🚛 Add Load</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Origin</label>
+          <input type="text" id="ld-origin" placeholder="Chicago, IL"/>
+        </div>
+        <div class="form-group">
+          <label>Destination</label>
+          <input type="text" id="ld-dest" placeholder="Nashville, TN"/>
+        </div>
+        <div class="form-group">
+          <label>Load Type</label>
+          <select id="ld-type">
+            <option>Dry Van</option>
+            <option>Reefer</option>
+            <option>Flatbed</option>
+            <option>Step Deck</option>
+            <option>Tanker</option>
+            <option>LTL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Miles</label>
+          <input type="number" id="ld-miles" placeholder="476"/>
+        </div>
+        <div class="form-group">
+          <label>Rate ($)</label>
+          <input type="number" id="ld-rate" placeholder="1150"/>
+        </div>
+        <div class="form-group">
+          <label>Fuel Cost ($)</label>
+          <input type="number" id="ld-fuel" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label>Other Expenses ($)</label>
+          <input type="number" id="ld-expenses" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="ld-date"/>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addLoad()">+ Add Load</button>
+    </div>
+
+    <!-- Loads Table -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <span class="table-card-title">Load History</span>
+        <button class="btn-danger" onclick="clearLoads()">Clear All</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Origin → Destination</th>
+              <th>Type</th>
+              <th>Miles</th>
+              <th>Rate</th>
+              <th>Expenses</th>
+              <th>Net</th>
+              <th>RPM</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="loadsBody">
+            <tr class="empty-row"><td colspan="9">No loads yet — add your first load above.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- P&L Cards -->
+    <div class="pnl-grid">
+      <div class="pnl-card">
+        <div class="pnl-icon">📈</div>
+        <div class="pnl-label">Total Revenue</div>
+        <div class="pnl-value green" id="pnl-revenue">$0.00</div>
+        <div class="pnl-sub" id="pnl-loads">0 loads this period</div>
+      </div>
+      <div class="pnl-card">
+        <div class="pnl-icon">📉</div>
+        <div class="pnl-label">Total Expenses</div>
+        <div class="pnl-value red" id="pnl-expenses">$0.00</div>
+        <div class="pnl-sub">Fuel + other costs</div>
+      </div>
+      <div class="pnl-card">
+        <div class="pnl-icon">⚡</div>
+        <div class="pnl-label">Net Profit</div>
+        <div class="pnl-value" id="pnl-profit">$0.00</div>
+        <div class="pnl-sub" id="pnl-margin">0% margin</div>
+      </div>
+    </div>
+
+  </section><!-- /dashboard -->
+
+  <!-- ══════════════════════════════════════════
+       PAGE: COMMAND CENTER
+  ══════════════════════════════════════════ -->
+  <section id="page-command" class="page-section">
+
+    <div class="section-head">
+      <h2>Command Center</h2>
+      <p>Professional tools for load analysis, trip planning, pay calculation, and weight compliance.</p>
+    </div>
+
+    <!-- Sub Navigation -->
+    <div class="sub-nav">
+      <button class="sub-tab active" onclick="switchSub('cc','dat',this)">📋 DAT Board</button>
+      <button class="sub-tab" onclick="switchSub('cc','trip',this)">🗺️ Trip Tools</button>
+      <button class="sub-tab" onclick="switchSub('cc','pay',this)">💰 Pay Calculator</button>
+      <button class="sub-tab" onclick="switchSub('cc','load',this)">📦 Load Planner</button>
+    </div>
+
+    <!-- DAT Board -->
+    <div id="cc-dat" class="sub-panel active">
+
+      <div class="form-card">
+        <div class="form-card-title">📋 Load Rate Analyzer</div>
+        <div class="form-grid-wide">
+          <div class="form-group">
+            <label>Origin City</label>
+            <input type="text" id="dat-origin" placeholder="Dallas, TX"/>
+          </div>
+          <div class="form-group">
+            <label>Destination City</label>
+            <input type="text" id="dat-dest" placeholder="Atlanta, GA"/>
+          </div>
+          <div class="form-group">
+            <label>Load Type</label>
+            <select id="dat-type">
+              <option>Dry Van</option>
+              <option>Reefer</option>
+              <option>Flatbed</option>
+              <option>Step Deck</option>
+              <option>Tanker</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Miles (est.)</label>
+            <input type="number" id="dat-miles" placeholder="1250"/>
+          </div>
+          <div class="form-group">
+            <label>Rate Offered ($)</label>
+            <input type="number" id="dat-rate" placeholder="2500"/>
+          </div>
+          <div class="form-group">
+            <label>Your CPM Cost (¢/mi)</label>
+            <input type="number" id="dat-cpm-cost" placeholder="180" step="1"/>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="calcDat()">Analyze Load</button>
+        <div class="result-box" id="dat-result"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="table-card-title">Sample Load Board Listings</span>
+          <span style="font-size:0.72rem;color:var(--t3)">Live data requires DAT subscription</span>
+        </div>
+        <div class="table-wrap">
+          <table class="lb-table">
+            <thead>
+              <tr><th>Origin</th><th>Destination</th><th>Type</th><th>Miles</th><th>Rate</th><th>RPM</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Chicago, IL</td><td>Nashville, TN</td><td>Dry Van</td><td>476</td><td>$1,150</td><td class="rpm-good">$2.42</td></tr>
+              <tr><td>Houston, TX</td><td>Los Angeles, CA</td><td>Reefer</td><td>1,553</td><td>$4,200</td><td class="rpm-good">$2.70</td></tr>
+              <tr><td>Atlanta, GA</td><td>Miami, FL</td><td>Flatbed</td><td>662</td><td>$1,450</td><td class="rpm-ok">$2.19</td></tr>
+              <tr><td>Denver, CO</td><td>Phoenix, AZ</td><td>Dry Van</td><td>601</td><td>$1,100</td><td class="rpm-low">$1.83</td></tr>
+              <tr><td>Seattle, WA</td><td>Salt Lake City, UT</td><td>Reefer</td><td>835</td><td>$2,600</td><td class="rpm-good">$3.11</td></tr>
+              <tr><td>Memphis, TN</td><td>Dallas, TX</td><td>Step Deck</td><td>445</td><td>$1,050</td><td class="rpm-ok">$2.36</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="legend">
+          <span class="rpm-good">■ $2.50+ Good</span>
+          <span class="rpm-ok">■ $2.00–2.49 Fair</span>
+          <span class="rpm-low">■ Under $2.00 Low</span>
+        </div>
+      </div>
+
+    </div><!-- /dat -->
+
+    <!-- Trip Tools -->
+    <div id="cc-trip" class="sub-panel">
+      <div class="sub-nav" style="margin-bottom:1.2rem">
+        <button class="sub-tab active" onclick="switchSub('trip','fuel',this)">⛽ Fuel Calc</button>
+        <button class="sub-tab" onclick="switchSub('trip','tripcost',this)">🧾 Trip Cost</button>
+        <button class="sub-tab" onclick="switchSub('trip','hos',this)">🕐 HOS Tracker</button>
+      </div>
+
+      <!-- Fuel Calculator -->
+      <div id="trip-fuel" class="sub-panel active">
+        <div class="form-card">
+          <div class="form-card-title">⛽ Fuel Cost Calculator</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Trip Distance (miles)</label><input type="number" id="fuel-miles" placeholder="1500"/></div>
+            <div class="form-group"><label>Truck MPG</label><input type="number" id="fuel-mpg" placeholder="6.5" step="0.1"/></div>
+            <div class="form-group"><label>Price per Gallon ($)</label><input type="number" id="fuel-price" placeholder="3.85" step="0.01"/></div>
+            <div class="form-group"><label>DEF Cost per Mile (¢)</label><input type="number" id="fuel-def" placeholder="2" step="0.1"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcFuel()">Calculate</button>
+          <div class="result-box" id="fuel-result"></div>
+        </div>
+      </div>
+
+      <!-- Trip Cost Calculator -->
+      <div id="trip-tripcost" class="sub-panel">
+        <div class="form-card">
+          <div class="form-card-title">🧾 Full Trip Cost Calculator</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Trip Miles</label><input type="number" id="tc-miles" placeholder="1500"/></div>
+            <div class="form-group"><label>MPG</label><input type="number" id="tc-mpg" placeholder="6.5" step="0.1"/></div>
+            <div class="form-group"><label>Fuel Price ($/gal)</label><input type="number" id="tc-fuel" placeholder="3.85" step="0.01"/></div>
+            <div class="form-group"><label>Toll Costs ($)</label><input type="number" id="tc-tolls" placeholder="0"/></div>
+            <div class="form-group"><label>Food / Per Diem ($)</label><input type="number" id="tc-food" placeholder="50"/></div>
+            <div class="form-group"><label>Hotel / Overnight ($)</label><input type="number" id="tc-hotel" placeholder="0"/></div>
+            <div class="form-group"><label>Misc / Other ($)</label><input type="number" id="tc-misc" placeholder="0"/></div>
+            <div class="form-group"><label>Load Rate ($)</label><input type="number" id="tc-rate" placeholder="2500"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcTripCost()">Calculate</button>
+          <div class="result-box" id="tripcost-result"></div>
+        </div>
+      </div>
+
+      <!-- HOS Tracker -->
+      <div id="trip-hos" class="sub-panel">
+        <div class="form-card">
+          <div class="form-card-title">🕐 HOS Log Tracker (11/14/70 Rule)</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Hours Driven Today</label><input type="number" id="hos-drive" placeholder="0" step="0.5" max="11"/></div>
+            <div class="form-group"><label>Hours On-Duty (non-driving)</label><input type="number" id="hos-onduty" placeholder="0" step="0.5"/></div>
+            <div class="form-group"><label>Hours Used This Week (of 70)</label><input type="number" id="hos-week" placeholder="0" step="0.5" max="70"/></div>
+            <div class="form-group"><label>Hours Since Last 10-hr Break</label><input type="number" id="hos-since" placeholder="0" step="0.5"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcHOS()">Check HOS Status</button>
+          <div class="result-box" id="hos-result"></div>
+          <div id="hos-gauges"></div>
+        </div>
+      </div>
+
+    </div><!-- /trip -->
+
+    <!-- Pay Calculator -->
+    <div id="cc-pay" class="sub-panel">
+      <div class="sub-nav" style="margin-bottom:1.2rem">
+        <button class="sub-tab active" onclick="switchSub('pay','cpm',this)">💵 CPM Calculator</button>
+        <button class="sub-tab" onclick="switchSub('pay','oo',this)">🏢 O/O Net Profit</button>
+      </div>
+
+      <!-- CPM -->
+      <div id="pay-cpm" class="sub-panel active">
+        <div class="form-card">
+          <div class="form-card-title">💵 Cents Per Mile Pay Calculator</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Miles Driven (week)</label><input type="number" id="cpm-miles" placeholder="2500"/></div>
+            <div class="form-group"><label>CPM Rate (¢)</label><input type="number" id="cpm-rate" placeholder="55" step="0.5"/></div>
+            <div class="form-group"><label>Accessorial Pay ($)</label><input type="number" id="cpm-acc" placeholder="0"/></div>
+            <div class="form-group"><label>Detention Pay ($)</label><input type="number" id="cpm-det" placeholder="0"/></div>
+            <div class="form-group"><label>Weeks per Year</label><input type="number" id="cpm-weeks" placeholder="50"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcCPM()">Calculate Earnings</button>
+          <div class="result-box" id="cpm-result"></div>
+        </div>
+      </div>
+
+      <!-- O/O Net -->
+      <div id="pay-oo" class="sub-panel">
+        <div class="form-card">
+          <div class="form-card-title">🏢 Owner Operator Net Profit Calculator</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Gross Revenue ($)</label><input type="number" id="oo-gross" placeholder="12000"/></div>
+            <div class="form-group"><label>Fuel Cost ($)</label><input type="number" id="oo-fuel" placeholder="3500"/></div>
+            <div class="form-group"><label>Truck Payment ($)</label><input type="number" id="oo-truck" placeholder="1200"/></div>
+            <div class="form-group"><label>Insurance ($)</label><input type="number" id="oo-ins" placeholder="900"/></div>
+            <div class="form-group"><label>Dispatcher / Broker Fee ($)</label><input type="number" id="oo-broker" placeholder="0"/></div>
+            <div class="form-group"><label>Maintenance / Repairs ($)</label><input type="number" id="oo-maint" placeholder="400"/></div>
+            <div class="form-group"><label>Permits / IFTA / Taxes ($)</label><input type="number" id="oo-tax" placeholder="300"/></div>
+            <div class="form-group"><label>Food / Per Diem ($)</label><input type="number" id="oo-food" placeholder="200"/></div>
+            <div class="form-group"><label>Other Expenses ($)</label><input type="number" id="oo-other" placeholder="0"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcOO()">Calculate Net Profit</button>
+          <div class="result-box" id="oo-result"></div>
+        </div>
+      </div>
+
+    </div><!-- /pay -->
+
+    <!-- Load Planner -->
+    <div id="cc-load" class="sub-panel">
+      <div class="sub-nav" style="margin-bottom:1.2rem">
+        <button class="sub-tab active" onclick="switchSub('lp','axle',this)">⚖️ Axle Weight</button>
+        <button class="sub-tab" onclick="switchSub('lp','payload',this)">📏 Max Payload</button>
+      </div>
+
+      <!-- Axle Weight -->
+      <div id="lp-axle" class="sub-panel active">
+        <div class="form-card">
+          <div class="form-card-title">⚖️ Axle Weight Distribution Calculator</div>
+          <p style="font-size:0.8rem;color:var(--t2);margin-bottom:1rem;">
+            Federal limits: Steer 12,000 lbs · Drive tandem 34,000 lbs · Trailer tandem 34,000 lbs · Gross 80,000 lbs
+          </p>
+          <div class="form-grid">
+            <div class="form-group"><label>Steer Axle (lbs)</label><input type="number" id="axle-steer" placeholder="11000"/></div>
+            <div class="form-group"><label>Drive Tandem (lbs)</label><input type="number" id="axle-drive" placeholder="32000"/></div>
+            <div class="form-group"><label>Trailer Tandem (lbs)</label><input type="number" id="axle-trailer" placeholder="32000"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcAxle()">Check Weights</button>
+          <div class="result-box" id="axle-result"></div>
+        </div>
+      </div>
+
+      <!-- Max Payload -->
+      <div id="lp-payload" class="sub-panel">
+        <div class="form-card">
+          <div class="form-card-title">📏 Maximum Payload Finder</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Truck Tare Weight (lbs)</label><input type="number" id="pay-truck" placeholder="16000"/></div>
+            <div class="form-group"><label>Trailer Tare Weight (lbs)</label><input type="number" id="pay-trailer" placeholder="14000"/></div>
+            <div class="form-group"><label>Fuel Weight (lbs)</label><input type="number" id="pay-fuel" placeholder="1500"/></div>
+            <div class="form-group"><label>Driver + Gear (lbs)</label><input type="number" id="pay-driver" placeholder="300"/></div>
+            <div class="form-group"><label>Legal Gross Limit (lbs)</label><input type="number" id="pay-gross" placeholder="80000"/></div>
+          </div>
+          <button class="btn-primary" onclick="calcPayload()">Find Max Payload</button>
+          <div class="result-box" id="payload-result"></div>
+        </div>
+      </div>
+
+    </div><!-- /load planner -->
+
+  </section><!-- /command -->
+
+  <!-- ══════════════════════════════════════════
+       PAGE: DRIVER TOOLS
+  ══════════════════════════════════════════ -->
+  <section id="page-driver-tools" class="page-section">
+
+    <!-- Hero Banner -->
+    <div class="dt-hero">
+      <div class="dt-eyebrow">
+        <span style="background:var(--gold);width:6px;height:6px;border-radius:50%;display:inline-block"></span>
+        Built for Owner-Operators
+      </div>
+      <h2>Know Your <span>Real Profit</span><br/>Before You Roll</h2>
+      <p>Professional trucking calculators for fuel costs, load profit, trip planning, break-even analysis, and more. Stop guessing — start calculating.</p>
+    </div>
+
+    <!-- Tool Pills -->
+    <div class="pill-strip">
+      <div class="pill free">⛽ Fuel Cost Calc</div>
+      <div class="pill free">📐 Cost Per Mile</div>
+      <div class="pill free">🗺️ Trip Profit</div>
+      <div class="pill free">📉 Break-Even</div>
+      <div class="pill pro">🔒 Load Profit Analyzer</div>
+      <div class="pill pro">🔒 Tax Estimator</div>
+      <div class="pill pro">🔒 Annual Projection</div>
+      <div class="pill pro">🔒 Truck Loan Calc</div>
+    </div>
+
+    <!-- Calculator Sub Tabs -->
+    <div class="sub-nav">
+      <button class="sub-tab active" onclick="switchSub('dt','fuelcalc',this)">⛽ Fuel Cost</button>
+      <button class="sub-tab" onclick="switchSub('dt','cpm-calc',this)">📐 Cost Per Mile</button>
+      <button class="sub-tab" onclick="switchSub('dt','trip-profit',this)">🗺️ Trip Profit</button>
+      <button class="sub-tab" onclick="switchSub('dt','breakeven',this)">📉 Break-Even</button>
+    </div>
+
+    <!-- Fuel Cost -->
+    <div id="dt-fuelcalc" class="sub-panel active">
+      <div class="form-card">
+        <div class="form-card-title">⛽ Fuel Cost Calculator</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Trip Distance (miles)</label><input type="number" id="dt-fuel-miles" placeholder="1200"/></div>
+          <div class="form-group"><label>Truck MPG</label><input type="number" id="dt-fuel-mpg" placeholder="6.5" step="0.1"/></div>
+          <div class="form-group"><label>Diesel Price ($/gal)</label><input type="number" id="dt-fuel-price" placeholder="3.85" step="0.01"/></div>
+          <div class="form-group"><label>DEF Cost per Mile (¢)</label><input type="number" id="dt-fuel-def" placeholder="2" step="0.1"/></div>
+        </div>
+        <button class="btn-primary" onclick="calcDTFuel()">Calculate Fuel Cost</button>
+        <div class="result-box" id="dt-fuel-result"></div>
+      </div>
+    </div>
+
+    <!-- Cost Per Mile -->
+    <div id="dt-cpm-calc" class="sub-panel">
+      <div class="form-card">
+        <div class="form-card-title">📐 True Cost Per Mile Calculator</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Miles Driven (month)</label><input type="number" id="dt-cpm-miles" placeholder="10000"/></div>
+          <div class="form-group"><label>Fuel Cost ($)</label><input type="number" id="dt-cpm-fuel" placeholder="4200"/></div>
+          <div class="form-group"><label>Truck Payment ($)</label><input type="number" id="dt-cpm-truck" placeholder="1200"/></div>
+          <div class="form-group"><label>Insurance ($)</label><input type="number" id="dt-cpm-ins" placeholder="900"/></div>
+          <div class="form-group"><label>Maintenance ($)</label><input type="number" id="dt-cpm-maint" placeholder="400"/></div>
+          <div class="form-group"><label>IFTA / Permits ($)</label><input type="number" id="dt-cpm-ifta" placeholder="300"/></div>
+          <div class="form-group"><label>Food / Per Diem ($)</label><input type="number" id="dt-cpm-food" placeholder="200"/></div>
+          <div class="form-group"><label>Other Expenses ($)</label><input type="number" id="dt-cpm-other" placeholder="0"/></div>
+        </div>
+        <button class="btn-primary" onclick="calcDTCPM()">Calculate CPM</button>
+        <div class="result-box" id="dt-cpm-result"></div>
+      </div>
+    </div>
+
+    <!-- Trip Profit -->
+    <div id="dt-trip-profit" class="sub-panel">
+      <div class="form-card">
+        <div class="form-card-title">🗺️ Trip Profit Calculator</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Trip Miles</label><input type="number" id="tp-miles" placeholder="1500"/></div>
+          <div class="form-group"><label>Load Rate ($)</label><input type="number" id="tp-rate" placeholder="2500"/></div>
+          <div class="form-group"><label>MPG</label><input type="number" id="tp-mpg" placeholder="6.5" step="0.1"/></div>
+          <div class="form-group"><label>Fuel Price ($/gal)</label><input type="number" id="tp-fuel-price" placeholder="3.85" step="0.01"/></div>
+          <div class="form-group"><label>Tolls ($)</label><input type="number" id="tp-tolls" placeholder="0"/></div>
+          <div class="form-group"><label>Food ($)</label><input type="number" id="tp-food" placeholder="50"/></div>
+          <div class="form-group"><label>Hotel ($)</label><input type="number" id="tp-hotel" placeholder="0"/></div>
+          <div class="form-group"><label>Broker Fee (%)</label><input type="number" id="tp-broker" placeholder="0" step="0.5"/></div>
+        </div>
+        <button class="btn-primary" onclick="calcTripProfit()">Calculate Trip Profit</button>
+        <div class="result-box" id="tp-result"></div>
+      </div>
+    </div>
+
+    <!-- Break-Even -->
+    <div id="dt-breakeven" class="sub-panel">
+      <div class="form-card">
+        <div class="form-card-title">📉 Break-Even Calculator</div>
+        <p style="font-size:0.8rem;color:var(--t2);margin-bottom:1rem;">Find the minimum rate and miles needed to cover all fixed costs.</p>
+        <div class="form-grid">
+          <div class="form-group"><label>Fixed Monthly Costs ($)</label><input type="number" id="be-fixed" placeholder="3500"/></div>
+          <div class="form-group"><label>Variable CPM (¢)</label><input type="number" id="be-vcpm" placeholder="1.20" step="0.01"/></div>
+          <div class="form-group"><label>Target Monthly Miles</label><input type="number" id="be-miles" placeholder="10000"/></div>
+          <div class="form-group"><label>Target Revenue ($)</label><input type="number" id="be-revenue" placeholder="12000"/></div>
+        </div>
+        <button class="btn-primary" onclick="calcBreakEven()">Calculate Break-Even</button>
+        <div class="result-box" id="be-result"></div>
+      </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div style="margin-top:3rem">
+      <h3 style="font-family:var(--f-display);font-size:1.4rem;font-weight:700;color:var(--t1);text-align:center;margin-bottom:0.4rem">
+        Everything a Driver Needs
+      </h3>
+      <p style="text-align:center;color:var(--t2);font-size:0.85rem;margin-bottom:1.8rem;font-weight:300">
+        Built around the real questions owner-operators ask every day.
+      </p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon-lg">⛽</div>
+          <div class="feature-title">Fuel Cost Calculator</div>
+          <div class="feature-desc">Distance, MPG, diesel price, DEF — get exact fuel cost and cost-per-mile instantly.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-lg">📐</div>
+          <div class="feature-title">True Cost Per Mile</div>
+          <div class="feature-desc">Enter every expense and see your actual CPM — not an estimate, the real number.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-lg">🗺️</div>
+          <div class="feature-title">Trip Profit Calculator</div>
+          <div class="feature-desc">Full analysis: fuel + tolls + food + hotel vs. load rate. Net profit in seconds.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-lg">📉</div>
+          <div class="feature-title">Break-Even Calculator</div>
+          <div class="feature-desc">Find the exact miles and rate you need to cover all costs and stay profitable.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-lg">📦</div>
+          <div class="feature-title">Load Profit Analyzer <span style="color:var(--gold);font-size:0.65em">[PRO]</span></div>
+          <div class="feature-desc">Factor deadhead miles, broker fees, and driver pay to get true net on any load.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-lg">🧾</div>
+          <div class="feature-title">Tax Estimator <span style="color:var(--gold);font-size:0.65em">[PRO]</span></div>
+          <div class="feature-desc">Estimate self-employment tax and federal due for owner-operators quarterly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div style="margin-top:3.5rem;text-align:center">
+      <h3 style="font-family:var(--f-display);font-size:1.6rem;font-weight:800;color:var(--t1);margin-bottom:0.3rem">
+        Simple, Fair Pricing
+      </h3>
+      <p style="color:var(--t2);font-size:0.85rem;margin-bottom:2rem">Start free. Upgrade when you need every tool.</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-tier">Free</div>
+          <div class="price-amount">$0</div>
+          <div class="price-period">Forever free · No credit card</div>
+          <ul class="price-features">
+            <li>✓ 4 core calculators</li>
+            <li>✓ Works offline</li>
+            <li>✓ Local data only</li>
+            <li class="off">✗ Load Profit Analyzer</li>
+            <li class="off">✗ Tax Estimator</li>
+          </ul>
+          <button class="btn-ghost" style="width:100%">Get Started Free</button>
+        </div>
+        <div class="price-card pro">
+          <div class="price-tier">Pro</div>
+          <div class="price-amount">$19<span style="font-size:1rem;color:var(--t3)">/mo</span></div>
+          <div class="price-period">Or $149/year — save 34%</div>
+          <ul class="price-features">
+            <li>✓ All 8 tools</li>
+            <li>✓ Load Profit Analyzer</li>
+            <li>✓ Tax Estimator (O/O)</li>
+            <li>✓ Truck Loan Calc</li>
+            <li>✓ Annual Projection</li>
+          </ul>
+          <button class="btn-primary" style="width:100%">⚡ Start Pro Trial</button>
+        </div>
+      </div>
+    </div>
+
+  </section><!-- /driver-tools -->
+
+</div><!-- /main-content -->
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <span>© <span id="footerYear"></span> RigOps · Driver Operating System</span>
+  <span style="color:var(--t3)">Dashboard · Command Center · Driver Tools</span>
+  <span>Built for the Road</span>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── Utilities ─────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const val = id => parseFloat($(id).value) || 0;
+const fmt = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtMi = n => n.toLocaleString('en-US') + ' mi';
+
+function showResult(id, html, type='') {
+  const el = $(id);
+  if (!el) return;
+  el.innerHTML = type === 'error'
+    ? `<div class="result-error">${html}</div>`
+    : type === 'warn'
+    ? `<div class="result-warn">${html}</div>`
+    : html;
+}
+
+function resultGrid(items) {
+  return '<div class="result-grid">' +
+    items.map(([label, value, cls='']) =>
+      `<div class="result-item ${cls}"><span>${label}</span><strong>${value}</strong></div>`
+    ).join('') +
+  '</div>';
+}
+
+/* ── Clock & Date ──────────────────────────────── */
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  const d = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  $('liveClock').textContent = t;
+  $('liveDate').textContent = d;
+  $('footerYear').textContent = now.getFullYear();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── Page Switching ────────────────────────────── */
+function switchPage(page, btn) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── Sub Tab Switching ─────────────────────────── */
+function switchSub(group, panel, btn) {
+  // find all sub-panels with ids starting with group- prefix
+  const allPanels = document.querySelectorAll(`[id^="${group}-"]`);
+  allPanels.forEach(p => p.classList.remove('active'));
+  // find all sub-tabs in the parent container
+  const parentNav = btn.closest('.sub-nav');
+  if (parentNav) parentNav.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  const target = $(`${group}-${panel}`);
+  if (target) target.classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD LOAD TRACKER
+═══════════════════════════════════════════ */
+let loads = JSON.parse(localStorage.getItem('rigops-loads') || '[]');
+
+function saveLoads() {
+  localStorage.setItem('rigops-loads', JSON.stringify(loads));
+}
+
+function addLoad() {
+  const origin   = $('ld-origin').value.trim();
+  const dest     = $('ld-dest').value.trim();
+  const type     = $('ld-type').value;
+  const miles    = val('ld-miles');
+  const rate     = val('ld-rate');
+  const fuel     = val('ld-fuel');
+  const expenses = val('ld-expenses');
+  const date     = $('ld-date').value || new Date().toISOString().split('T')[0];
+
+  if (!origin || !dest || !miles || !rate) {
+    alert('Please fill in Origin, Destination, Miles, and Rate.');
+    return;
+  }
+
+  const totalExp = fuel + expenses;
+  const net      = rate - totalExp;
+  const rpm      = miles > 0 ? rate / miles : 0;
+
+  loads.unshift({ id: Date.now(), origin, dest, type, miles, rate, fuel, expenses, totalExp, net, rpm, date });
+  saveLoads();
+  renderLoads();
+  updateDashStats();
+
+  // Clear form
+  ['ld-origin','ld-dest','ld-miles','ld-rate','ld-fuel','ld-expenses','ld-date']
+    .forEach(id => $(id).value = '');
+}
+
+function removeLoad(id) {
+  loads = loads.filter(l => l.id !== id);
+  saveLoads();
+  renderLoads();
+  updateDashStats();
+}
+
+function clearLoads() {
+  if (!loads.length) return;
+  if (!confirm('Clear all load history? This cannot be undone.')) return;
+  loads = [];
+  saveLoads();
+  renderLoads();
+  updateDashStats();
+}
+
+function renderLoads() {
+  const tbody = $('loadsBody');
+  if (!loads.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No loads yet — add your first load above.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = loads.map(l => {
+    const netCls = l.net >= 0 ? 'td-green' : 'td-red';
+    const rpmCls = l.rpm >= 2.5 ? 'td-green' : (l.rpm >= 2.0 ? 'td-gold' : 'td-red');
+    return `<tr>
+      <td>${l.date}</td>
+      <td>${l.origin} → ${l.dest}</td>
+      <td>${l.type}</td>
+      <td>${l.miles.toLocaleString()}</td>
+      <td class="td-gold">${fmt(l.rate)}</td>
+      <td class="td-red">${l.totalExp > 0 ? fmt(l.totalExp) : '—'}</td>
+      <td class="${netCls}">${fmt(l.net)}</td>
+      <td class="${rpmCls}">$${l.rpm.toFixed(2)}</td>
+      <td><button class="btn-danger" onclick="removeLoad(${l.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateDashStats() {
+  const totalRev  = loads.reduce((s, l) => s + l.rate, 0);
+  const totalExp  = loads.reduce((s, l) => s + l.totalExp, 0);
+  const totalNet  = totalRev - totalExp;
+  const totalMi   = loads.reduce((s, l) => s + l.miles, 0);
+  const margin    = totalRev > 0 ? (totalNet / totalRev * 100) : 0;
+  const avgRpm    = totalMi > 0 ? totalRev / totalMi : 0;
+
+  $('dash-revenue').textContent  = fmt(totalRev);
+  $('dash-expenses').textContent = fmt(totalExp);
+  $('dash-profit').textContent   = fmt(totalNet);
+  $('dash-miles').textContent    = totalMi.toLocaleString();
+  $('dash-load-count').textContent = `${loads.length} load${loads.length !== 1 ? 's' : ''}`;
+  $('dash-margin').textContent   = margin.toFixed(1) + '% margin';
+  $('dash-rpm').textContent      = '$' + avgRpm.toFixed(2) + ' / mile';
+
+  $('pnl-revenue').textContent  = fmt(totalRev);
+  $('pnl-expenses').textContent = fmt(totalExp);
+  const profitEl = $('pnl-profit');
+  profitEl.textContent = fmt(totalNet);
+  profitEl.className   = 'pnl-value ' + (totalNet >= 0 ? 'green' : 'red');
+  $('pnl-loads').textContent  = `${loads.length} load${loads.length !== 1 ? 's' : ''} this period`;
+  $('pnl-margin').textContent = margin.toFixed(1) + '% net margin';
+}
+
+// Init dashboard on load
+renderLoads();
+updateDashStats();
+
+/* ═══════════════════════════════════════════
+   COMMAND CENTER CALCULATORS
+═══════════════════════════════════════════ */
+
+/* DAT Load Analyzer */
+function calcDat() {
+  const miles   = val('dat-miles');
+  const rate    = val('dat-rate');
+  const cpmCost = val('dat-cpm-cost') || 180;
+
+  if (!miles || !rate) { showResult('dat-result', 'Enter miles and rate offered.', 'error'); return; }
+
+  const rpm        = rate / miles;
+  const tripCost   = (cpmCost / 100) * miles;
+  const net        = rate - tripCost;
+  const margin     = (net / rate * 100);
+  const rpmClass   = rpm >= 2.5 ? 'green-item' : rpm >= 2.0 ? 'highlight' : 'red-item';
+  const verdict    = rpm >= 2.5 ? '✅ Strong Load' : rpm >= 2.0 ? '⚠️ Fair Load' : '❌ Below Cost';
+
+  showResult('dat-result', resultGrid([
+    ['Rate Per Mile',  '$' + rpm.toFixed(2),      rpmClass],
+    ['Est. Trip Cost', fmt(tripCost),              'red-item'],
+    ['Est. Net Profit',fmt(net),                   net>=0?'green-item':'red-item'],
+    ['Profit Margin',  margin.toFixed(1) + '%',   ''],
+    ['Verdict',        verdict,                    ''],
+    ['Total Miles',    miles.toLocaleString(),     ''],
+  ]));
+}
+
+/* Fuel Calculator (Command Center) */
+function calcFuel() {
+  const miles = val('fuel-miles');
+  const mpg   = val('fuel-mpg');
+  const price = val('fuel-price');
+  const def   = val('fuel-def');
+
+  if (!miles || !mpg || !price) { showResult('fuel-result', 'Please fill in distance, MPG, and fuel price.', 'error'); return; }
+
+  const gallons  = miles / mpg;
+  const fuelCost = gallons * price;
+  const defCost  = (miles * def) / 100;
+  const total    = fuelCost + defCost;
+  const cpm      = total / miles;
+
+  showResult('fuel-result', resultGrid([
+    ['Gallons Needed',   gallons.toFixed(1) + ' gal', ''],
+    ['Fuel Cost',        fmt(fuelCost),               ''],
+    ['DEF Cost',         fmt(defCost),                ''],
+    ['Total Fuel Cost',  fmt(total),                  'highlight'],
+    ['Cost Per Mile',    (cpm*100).toFixed(1) + '¢',  ''],
+  ]));
+}
+
+/* Trip Cost Calculator */
+function calcTripCost() {
+  const miles   = val('tc-miles');
+  const mpg     = val('tc-mpg') || 6.5;
+  const fuelPri = val('tc-fuel');
+  const tolls   = val('tc-tolls');
+  const food    = val('tc-food');
+  const hotel   = val('tc-hotel');
+  const misc    = val('tc-misc');
+  const rate    = val('tc-rate');
+
+  if (!miles || !fuelPri) { showResult('tripcost-result', 'Enter trip miles and fuel price.', 'error'); return; }
+
+  const fuelCost   = (miles / mpg) * fuelPri;
+  const totalExp   = fuelCost + tolls + food + hotel + misc;
+  const net        = rate - totalExp;
+  const margin     = rate > 0 ? (net / rate * 100) : 0;
+  const rpm        = miles > 0 ? rate / miles : 0;
+  const netPerMile = miles > 0 ? net / miles : 0;
+
+  showResult('tripcost-result', resultGrid([
+    ['Fuel Cost',       fmt(fuelCost),             'red-item'],
+    ['Tolls',           fmt(tolls),                ''],
+    ['Food',            fmt(food),                 ''],
+    ['Hotel',           fmt(hotel),                ''],
+    ['Total Expenses',  fmt(totalExp),             'red-item'],
+    ['Load Rate',       fmt(rate),                 'green-item'],
+    ['Net Profit',      fmt(net),                  net>=0?'green-item':'red-item'],
+    ['Profit Margin',   margin.toFixed(1) + '%',   ''],
+    ['Rate Per Mile',   '$' + rpm.toFixed(2),      ''],
+    ['Net Per Mile',    '$' + netPerMile.toFixed(2),'highlight'],
+  ]));
+}
+
+/* HOS Tracker */
+function calcHOS() {
+  const drive    = val('hos-drive');
+  const onduty   = val('hos-onduty');
+  const week     = val('hos-week');
+  const sinceBreak = val('hos-since');
+
+  const totalOnDuty   = drive + onduty;
+  const remainDrive   = Math.max(0, 11 - drive);
+  const remainWindow  = Math.max(0, 14 - totalOnDuty);
+  const remainWeekly  = Math.max(0, 70 - week);
+  const remainBreak   = Math.max(0, 14 - sinceBreak);
+
+  let alerts = [];
+  if (drive >= 11)       alerts.push('🛑 11-hour drive limit REACHED — must take 10-hour break.');
+  if (totalOnDuty >= 14) alerts.push('🛑 14-hour duty window EXPIRED — must take 10-hour break.');
+  if (week >= 70)        alerts.push('🛑 70-hour weekly limit REACHED — must take 34-hour restart.');
+  if (drive >= 8 && drive < 11) alerts.push('⚠️ 30-minute rest break required (8 hrs driving).');
+
+  const alertHtml = alerts.length
+    ? `<div class="result-warn" style="margin-bottom:1rem">${alerts.join('<br/>')}</div>`
+    : `<div class="result-box" style="margin-bottom:1rem"><div class="result-grid" style="grid-template-columns:1fr"><div class="result-item green-item"><span>Status</span><strong>✅ HOS Compliant</strong></div></div></div>`;
+
+  showResult('hos-result', alertHtml + resultGrid([
+    ['Drive Remaining',  remainDrive.toFixed(1) + ' hrs',   remainDrive <= 2 ? 'red-item' : ''],
+    ['Window Remaining', remainWindow.toFixed(1) + ' hrs',  remainWindow <= 2 ? 'red-item' : ''],
+    ['Weekly Remaining', remainWeekly.toFixed(1) + ' hrs',  remainWeekly <= 8 ? 'red-item' : ''],
+    ['Since Last Break', sinceBreak.toFixed(1) + ' hrs',    sinceBreak >= 8 ? 'red-item' : ''],
+  ]));
+
+  // Gauges
+  $('hos-gauges').innerHTML = [
+    {label:'11-Hr Drive',   used:drive,    max:11,  color:'#3B82F6'},
+    {label:'14-Hr Window',  used:totalOnDuty, max:14, color:'#F0A500'},
+    {label:'70-Hr Cycle',   used:week,     max:70,  color:'#EF4444'},
+  ].map(g => {
+    const pct = Math.min(100, (g.used / g.max) * 100);
+    const col  = pct >= 90 ? '#EF4444' : pct >= 70 ? '#F0A500' : g.color;
+    return `<div class="hos-gauge-item">
+      <div class="hos-gauge-label"><span>${g.label}</span><span>${g.used.toFixed(1)} / ${g.max} hrs</span></div>
+      <div class="hos-gauge-track"><div class="hos-gauge-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* CPM Calculator */
+function calcCPM() {
+  const miles = val('cpm-miles');
+  const rate  = val('cpm-rate');
+  const acc   = val('cpm-acc');
+  const det   = val('cpm-det');
+  const weeks = val('cpm-weeks') || 50;
+
+  if (!miles || !rate) { showResult('cpm-result', 'Enter miles and CPM rate.', 'error'); return; }
+
+  const weeklyMile = (miles * rate) / 100;
+  const weeklyTotal = weeklyMile + acc + det;
+  const annual = weeklyTotal * weeks;
+  const monthly = annual / 12;
+
+  showResult('cpm-result', resultGrid([
+    ['CPM Earnings',    fmt(weeklyMile),  ''],
+    ['Accessorial',     fmt(acc),         ''],
+    ['Detention',       fmt(det),         ''],
+    ['Weekly Gross',    fmt(weeklyTotal), 'highlight'],
+    ['Monthly Gross',   fmt(monthly),     'green-item'],
+    ['Annual Gross',    fmt(annual),      'green-item'],
+  ]));
+}
+
+/* O/O Net Profit */
+function calcOO() {
+  const gross  = val('oo-gross');
+  const fuel   = val('oo-fuel');
+  const truck  = val('oo-truck');
+  const ins    = val('oo-ins');
+  const broker = val('oo-broker');
+  const maint  = val('oo-maint');
+  const tax    = val('oo-tax');
+  const food   = val('oo-food');
+  const other  = val('oo-other');
+
+  if (!gross) { showResult('oo-result', 'Enter gross revenue.', 'error'); return; }
+
+  const totalExp = fuel + truck + ins + broker + maint + tax + food + other;
+  const net      = gross - totalExp;
+  const margin   = gross > 0 ? (net / gross * 100) : 0;
+
+  showResult('oo-result', resultGrid([
+    ['Gross Revenue',   fmt(gross),               'green-item'],
+    ['Total Expenses',  fmt(totalExp),             'red-item'],
+    ['Net Profit',      fmt(net),                  net>=0?'green-item':'red-item'],
+    ['Profit Margin',   margin.toFixed(1) + '%',  'highlight'],
+    ['Fuel Cost',       fmt(fuel),                ''],
+    ['Truck + Insurance', fmt(truck+ins),         ''],
+  ]));
+}
+
+/* Axle Weight */
+function calcAxle() {
+  const steer   = val('axle-steer');
+  const drive   = val('axle-drive');
+  const trailer = val('axle-trailer');
+
+  if (!steer || !drive || !trailer) { showResult('axle-result', 'Enter all three axle weights.', 'error'); return; }
+
+  const gross = steer + drive + trailer;
+  const issues = [];
+  if (steer   > 12000) issues.push(`Steer axle over limit by ${(steer-12000).toLocaleString()} lbs`);
+  if (drive   > 34000) issues.push(`Drive tandem over limit by ${(drive-34000).toLocaleString()} lbs`);
+  if (trailer > 34000) issues.push(`Trailer tandem over limit by ${(trailer-34000).toLocaleString()} lbs`);
+  if (gross   > 80000) issues.push(`Gross weight over 80,000 lb limit by ${(gross-80000).toLocaleString()} lbs`);
+
+  const ok = issues.length === 0;
+  const statusHtml = ok
+    ? '<div class="result-warn" style="background:var(--green-dim);border-color:rgba(34,197,94,0.3);color:var(--green);margin-bottom:1rem">✅ All axle weights are LEGAL</div>'
+    : `<div class="result-warn" style="margin-bottom:1rem">❌ Weight violations:<br/>${issues.map(i=>'• '+i).join('<br/>')}</div>`;
+
+  showResult('axle-result', statusHtml + resultGrid([
+    ['Steer Axle',      steer.toLocaleString() + ' lbs',  steer > 12000 ? 'red-item' : 'green-item'],
+    ['Drive Tandem',    drive.toLocaleString() + ' lbs',  drive > 34000 ? 'red-item' : 'green-item'],
+    ['Trailer Tandem',  trailer.toLocaleString() + ' lbs',trailer > 34000 ? 'red-item' : 'green-item'],
+    ['Gross Weight',    gross.toLocaleString() + ' lbs',  gross > 80000 ? 'red-item' : 'highlight'],
+    ['Remaining (Gross)',Math.max(0,80000-gross).toLocaleString() + ' lbs', ''],
+  ]));
+}
+
+/* Max Payload */
+function calcPayload() {
+  const truck  = val('pay-truck');
+  const trail  = val('pay-trailer');
+  const fuel   = val('pay-fuel');
+  const driver = val('pay-driver');
+  const gross  = val('pay-gross') || 80000;
+
+  if (!truck || !trail) { showResult('payload-result', 'Enter truck and trailer tare weights.', 'error'); return; }
+
+  const tare    = truck + trail + fuel + driver;
+  const payload = Math.max(0, gross - tare);
+
+  showResult('payload-result', resultGrid([
+    ['Truck Tare',    truck.toLocaleString() + ' lbs',    ''],
+    ['Trailer Tare',  trail.toLocaleString() + ' lbs',    ''],
+    ['Fuel Weight',   fuel.toLocaleString() + ' lbs',     ''],
+    ['Driver + Gear', driver.toLocaleString() + ' lbs',   ''],
+    ['Total Tare',    tare.toLocaleString() + ' lbs',     'red-item'],
+    ['Max Payload',   payload.toLocaleString() + ' lbs',  'highlight'],
+    ['Max Payload (tons)', (payload/2000).toFixed(2) + ' tons', 'green-item'],
+  ]));
+}
+
+/* ═══════════════════════════════════════════
+   DRIVER TOOLS CALCULATORS
+═══════════════════════════════════════════ */
+
+/* DT Fuel Cost */
+function calcDTFuel() {
+  const miles = val('dt-fuel-miles');
+  const mpg   = val('dt-fuel-mpg');
+  const price = val('dt-fuel-price');
+  const def   = val('dt-fuel-def');
+
+  if (!miles || !mpg || !price) { showResult('dt-fuel-result', 'Please fill in distance, MPG, and fuel price.', 'error'); return; }
+
+  const gallons  = miles / mpg;
+  const fuelCost = gallons * price;
+  const defCost  = (miles * def) / 100;
+  const total    = fuelCost + defCost;
+  const cpm      = total / miles;
+
+  showResult('dt-fuel-result', resultGrid([
+    ['Gallons Needed',  gallons.toFixed(1) + ' gal', ''],
+    ['Diesel Cost',     fmt(fuelCost),               ''],
+    ['DEF Cost',        fmt(defCost),                ''],
+    ['Total Fuel Cost', fmt(total),                  'highlight'],
+    ['Cost Per Mile',   (cpm*100).toFixed(1) + '¢', 'red-item'],
+  ]));
+}
+
+/* DT Cost Per Mile */
+function calcDTCPM() {
+  const miles = val('dt-cpm-miles');
+  const fuel  = val('dt-cpm-fuel');
+  const truck = val('dt-cpm-truck');
+  const ins   = val('dt-cpm-ins');
+  const maint = val('dt-cpm-maint');
+  const ifta  = val('dt-cpm-ifta');
+  const food  = val('dt-cpm-food');
+  const other = val('dt-cpm-other');
+
+  if (!miles) { showResult('dt-cpm-result', 'Enter miles driven.', 'error'); return; }
+
+  const total = fuel + truck + ins + maint + ifta + food + other;
+  const cpm   = total / miles;
+
+  showResult('dt-cpm-result', resultGrid([
+    ['Total Expenses',  fmt(total),                   'red-item'],
+    ['Miles Driven',    miles.toLocaleString(),       ''],
+    ['True CPM',        (cpm*100).toFixed(1) + '¢',  'highlight'],
+    ['Breakeven RPM',   '$' + cpm.toFixed(3),         ''],
+    ['Fuel CPM',        (fuel/miles*100).toFixed(1) + '¢', ''],
+    ['Non-Fuel CPM',    ((total-fuel)/miles*100).toFixed(1) + '¢', ''],
+  ]));
+}
+
+/* DT Trip Profit */
+function calcTripProfit() {
+  const miles    = val('tp-miles');
+  const rate     = val('tp-rate');
+  const mpg      = val('tp-mpg') || 6.5;
+  const fuelPri  = val('tp-fuel-price');
+  const tolls    = val('tp-tolls');
+  const food     = val('tp-food');
+  const hotel    = val('tp-hotel');
+  const brokerPct= val('tp-broker');
+
+  if (!miles || !rate || !fuelPri) { showResult('tp-result', 'Enter miles, rate, and fuel price.', 'error'); return; }
+
+  const fuelCost   = (miles / mpg) * fuelPri;
+  const brokerFee  = rate * (brokerPct / 100);
+  const totalExp   = fuelCost + tolls + food + hotel + brokerFee;
+  const net        = rate - totalExp;
+  const margin     = (net / rate * 100);
+  const rpm        = rate / miles;
+  const netPerMile = net / miles;
+
+  showResult('tp-result', resultGrid([
+    ['Rate Per Mile',   '$' + rpm.toFixed(2),        ''],
+    ['Fuel Cost',       fmt(fuelCost),               'red-item'],
+    ['Broker Fee',      fmt(brokerFee),              ''],
+    ['All Expenses',    fmt(totalExp),               'red-item'],
+    ['Net Profit',      fmt(net),                   net>=0?'green-item':'red-item'],
+    ['Profit Margin',   margin.toFixed(1) + '%',    'highlight'],
+    ['Net Per Mile',    '$' + netPerMile.toFixed(2),''],
+  ]));
+}
+
+/* ── PWA Service Worker ─────────────────────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+/* DT Break-Even */
+function calcBreakEven() {
+  const fixed   = val('be-fixed');
+  const vcpm    = val('be-vcpm');
+  const miles   = val('be-miles');
+  const revenue = val('be-revenue');
+
+  if (!fixed) { showResult('be-result', 'Enter your fixed monthly costs.', 'error'); return; }
+
+  const totalCost    = fixed + (vcpm / 100) * miles;
+  const beRPM        = miles > 0 ? totalCost / miles : 0;
+  const beMinMiles   = (vcpm / 100) < 1 && revenue > 0 ? fixed / (revenue / miles - vcpm / 100) : 0;
+  const surplus      = revenue - totalCost;
+  const marginPct    = revenue > 0 ? (surplus / revenue * 100) : 0;
+
+  showResult('be-result', resultGrid([
+    ['Fixed Costs',        fmt(fixed),               'red-item'],
+    ['Variable Costs',     fmt((vcpm/100)*miles),    ''],
+    ['Total Monthly Cost', fmt(totalCost),            'red-item'],
+    ['Break-Even RPM',     '$' + beRPM.toFixed(3),  'highlight'],
+    ['Surplus / Deficit',  fmt(surplus),              surplus>=0?'green-item':'red-item'],
+    ['Profit Margin',      marginPct.toFixed(1) + '%',''],
+  ]));
+}
+
+</script>
+</body>
+</html>

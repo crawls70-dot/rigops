@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RigOps V1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">Rig<span class="logo-accent">Ops</span></span>
+        <span class="logo-version">V1</span>
+      </div>
+      <div class="header-meta">
+        <span class="header-date" id="headerDate"></span>
+        <span class="status-dot"></span>
+        <span class="header-status">Live</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Summary Bar ────────────────────────────────────────────── -->
+  <section class="summary-bar" id="summaryBar">
+    <div class="summary-item">
+      <span class="summary-label">Revenue</span>
+      <span class="summary-value" id="sumRevenue">—</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Expenses</span>
+      <span class="summary-value red" id="sumExpenses">—</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Net Profit</span>
+      <span class="summary-value green" id="sumProfit">—</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Total Miles</span>
+      <span class="summary-value" id="sumMiles">—</span>
+    </div>
+  </section>
+
+  <!-- ── Tabs ───────────────────────────────────────────────────── -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="loads">
+      <span class="tab-icon">🚛</span> My Loads
+    </button>
+    <button class="tab" data-tab="money">
+      <span class="tab-icon">💰</span> My Money
+    </button>
+  </nav>
+
+  <!-- ── Main Content ───────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- LOADS TAB -->
+    <section id="tab-loads" class="tab-panel active">
+      <div class="panel-header">
+        <h2 class="panel-title">Load Board</h2>
+        <span class="panel-count" id="loadCount">0 loads</span>
+      </div>
+      <div class="loads-grid" id="loadsGrid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </section>
+
+    <!-- MONEY TAB -->
+    <section id="tab-money" class="tab-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">Financial Overview</h2>
+        <span class="panel-count">This Period</span>
+      </div>
+
+      <!-- P&L Cards -->
+      <div class="pnl-grid">
+        <div class="pnl-card pnl-revenue">
+          <div class="pnl-icon">📈</div>
+          <div class="pnl-label">Total Revenue</div>
+          <div class="pnl-value" id="moneyRevenue">—</div>
+          <div class="pnl-sub" id="moneyLoads">— loads</div>
+        </div>
+        <div class="pnl-card pnl-expenses">
+          <div class="pnl-icon">📉</div>
+          <div class="pnl-label">Total Expenses</div>
+          <div class="pnl-value red" id="moneyExpenses">—</div>
+          <div class="pnl-sub">Operating costs</div>
+        </div>
+        <div class="pnl-card pnl-profit">
+          <div class="pnl-icon">⚡</div>
+          <div class="pnl-label">Net Profit</div>
+          <div class="pnl-value" id="moneyProfit">—</div>
+          <div class="pnl-sub" id="moneyMargin">— margin</div>
+        </div>
+      </div>
+
+      <!-- Expense Breakdown -->
+      <div class="breakdown-section">
+        <h3 class="breakdown-title">Expense Breakdown</h3>
+        <div class="breakdown-list" id="breakdownList">
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>RigOps V1 &mdash; Driver Operating System</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

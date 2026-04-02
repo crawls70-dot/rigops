@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RigOps — Dashboard</title>
+  <link rel="stylesheet" href="styles/design-system.css"/>
+  <style>
+    /* ── Dashboard-specific styles ─────────────────────── */
+
+    /* Upgrade page layout */
+    .upgrade-hero {
+      text-align: center;
+      padding: 2rem 1rem 1.5rem;
+    }
+    .upgrade-hero h1 {
+      font-family: var(--f-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--t1);
+    }
+    .upgrade-hero h1 span { color: var(--gold); }
+    .upgrade-hero p { color: var(--t2); font-size: .9rem; margin-top: .5rem; max-width: 500px; margin-inline: auto; }
+
+    .plan-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin: 2rem 0;
+    }
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-xl);
+      padding: 2rem 1.8rem;
+      position: relative;
+      transition: all .2s;
+    }
+    .plan-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,.4); }
+    .plan-card.featured {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, var(--raised) 0%, var(--surface) 100%);
+      box-shadow: 0 0 40px var(--gold-dim);
+    }
+    .plan-popular {
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: #000;
+      font-family: var(--f-mono);
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .8rem;
+      border-radius: 20px;
+    }
+    .plan-name {
+      font-family: var(--f-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--t2);
+      margin-bottom: .8rem;
+    }
+    .plan-price {
+      font-family: var(--f-display);
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--t1);
+      line-height: 1;
+    }
+    .plan-price span { font-size: 1rem; color: var(--t3); font-weight: 400; }
+    .plan-price.gold-price { color: var(--gold); }
+    .plan-billing {
+      font-family: var(--f-mono);
+      font-size: .68rem;
+      color: var(--t3);
+      margin-top: .3rem;
+      margin-bottom: 1.5rem;
+    }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.8rem; }
+    .plan-features li {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .82rem;
+      color: var(--t2);
+    }
+    .feat-check { color: var(--green); font-size: .85rem; flex-shrink: 0; }
+    .feat-cross { color: var(--t4);   font-size: .85rem; flex-shrink: 0; }
+
+    /* Pro tools badge in header */
+    .pro-chip {
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-glow);
+      color: var(--gold);
+      font-family: var(--f-mono);
+      font-size: .6rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+      margin-left: .4rem;
+    }
+
+    /* Stripe button styling */
+    .stripe-btn-wrap { display: flex; flex-direction: column; gap: .5rem; }
+    .stripe-divider {
+      text-align: center;
+      font-family: var(--f-mono);
+      font-size: .65rem;
+      color: var(--t4);
+      position: relative;
+    }
+    .stripe-divider::before, .stripe-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%; width: 40%; height: 1px;
+      background: var(--b1);
+    }
+    .stripe-divider::before { left: 0; }
+    .stripe-divider::after { right: 0; }
+
+    /* Saved data page */
+    .saved-actions {
+      display: flex; justify-content: flex-end; margin-bottom: 1rem;
+    }
+
+    /* Inline tool panel navigation within tools pages */
+    .tool-subnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1.5rem;
+    }
+    .tool-subnav-btn {
+      padding: .4rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--b1);
+      border-radius: var(--r);
+      font-family: var(--f-display);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--t2);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .tool-subnav-btn:hover { border-color: var(--b3); color: var(--t1); }
+    .tool-subnav-btn.active {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .sub-tool { display: none; }
+    .sub-tool.active { display: block; animation: fadeUp .2s ease; }
+
+    /* Settings page */
+    .settings-group {
+      background: var(--surface);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+    .settings-group-title {
+      padding: .9rem 1.3rem;
+      background: var(--raised);
+      border-bottom: 1px solid var(--b1);
+      font-family: var(--f-display);
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--t1);
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .9rem 1.3rem;
+      border-bottom: 1px solid var(--b0);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row-label { font-size: .84rem; color: var(--t1); }
+    .settings-row-sub { font-family: var(--f-mono); font-size: .67rem; color: var(--t3); margin-top: .1rem; }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-mark">🚛</div>
+      <div class="brand-text-block">
+        <div class="brand-name">RigOps</div>
+        <div class="brand-sub">Driver Tools</div>
+      </div>
+    </div>
+
+    <button class="hamburger" aria-label="Menu">☰</button>
+
+    <div class="topbar-right">
+      <div class="topbar-meta">
+        <div id="live-date">—</div>
+        <strong id="live-clock">—</strong>
+      </div>
+      <div class="topbar-sep"></div>
+      <div class="plan-badge-display pill-badge pill-free"><span class="pill-dot"></span>FREE</div>
+      <div class="topbar-sep"></div>
+      <button class="topbar-user-btn" onclick="Nav.go('settings')">
+        <div class="user-avatar">D</div>
+        <span class="user-name">Driver</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- OVERLAY (mobile) -->
+  <div class="overlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-group-label">Main</div>
+    <div class="nav-item active" data-nav="dashboard"><span class="nav-icon">⬡</span> Dashboard</div>
+
+    <div class="nav-group-label">Financial Tools</div>
+    <div class="nav-item" data-nav="financial"><span class="nav-icon">💰</span> Financial Tools <span class="nav-badge nav-badge-new">5</span></div>
+
+    <div class="nav-group-label">Operations</div>
+    <div class="nav-item" data-nav="operations"><span class="nav-icon">🚚</span> Operations Tools</div>
+
+    <div class="nav-group-label">Business</div>
+    <div class="nav-item" data-nav="business"><span class="nav-icon">📊</span> Business Tools <span class="nav-badge nav-badge-gold">PRO</span></div>
+
+    <div class="nav-group-label">Account</div>
+    <div class="nav-item" data-nav="saved"><span class="nav-icon">💾</span> Saved Data</div>
+    <div class="nav-item" data-nav="settings"><span class="nav-icon">⚙️</span> Settings</div>
+
+    <div class="nav-upgrade" onclick="Nav.go('upgrade')">
+      <div class="nav-upgrade-icon">⚡</div>
+      <h4>Upgrade to Pro</h4>
+      <p>Unlock 5 premium tools + unlimited history</p>
+      <button class="upgrade-cta">Get Pro — $9/mo</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ═══════════ DASHBOARD ═══════════ -->
+    <div class="page active" data-page="dashboard">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Welcome back 👋</h1>
+          <p>Your trucking command center. Run calculations, track profits, and plan smarter.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-card" style="--accent-line:var(--gold)">
+            <div class="stat-label">Calculations Run</div>
+            <div class="stat-value gold" id="stat-calcs-run">0</div>
+            <div class="stat-sub">All time</div>
+            <div class="stat-icon">🧮</div>
+          </div>
+          <div class="stat-card" style="--accent-line:var(--green)">
+            <div class="stat-label">Recent Net (5 trips)</div>
+            <div class="stat-value green" id="stat-net">—</div>
+            <div class="stat-sub">From trip calc history</div>
+            <div class="stat-icon">💵</div>
+          </div>
+          <div class="stat-card" style="--accent-line:var(--cyan)">
+            <div class="stat-label">Trips Analyzed</div>
+            <div class="stat-value cyan" id="stat-trips">0</div>
+            <div class="stat-sub">Last 5 sessions</div>
+            <div class="stat-icon">🗺️</div>
+          </div>
+          <div class="stat-card" style="--accent-line:var(--purple)">
+            <div class="stat-label">Avg Profit Margin</div>
+            <div class="stat-value" id="stat-margin">—</div>
+            <div class="stat-sub">Recent trips</div>
+            <div class="stat-icon">📈</div>
+          </div>
+        </div>
+
+        <!-- Free Tools -->
+        <div class="section-label">Free Tools</div>
+        <div class="tool-grid">
+          <div class="tool-card" data-goto="financial">
+            <div class="tc-icon gold">⛽</div>
+            <div class="tc-title">Fuel Cost Calculator</div>
+            <div class="tc-desc">Calculate exact fuel costs for any trip with MPG, price, and DEF.</div>
+            <div class="tc-arrow">→</div>
+          </div>
+          <div class="tool-card" data-goto="financial">
+            <div class="tc-icon gold">📐</div>
+            <div class="tc-title">Cost Per Mile</div>
+            <div class="tc-desc">Break down every operating cost into cost-per-mile.</div>
+            <div class="tc-arrow">→</div>
+          </div>
+          <div class="tool-card" data-goto="operations">
+            <div class="tc-icon cyan">🗺️</div>
+            <div class="tc-title">Trip Mileage Calc</div>
+            <div class="tc-desc">Full trip profitability: fuel, tolls, food, hotel vs. load rate.</div>
+            <div class="tc-arrow">→</div>
+          </div>
+          <div class="tool-card" data-goto="financial">
+            <div class="tc-icon green">📉</div>
+            <div class="tc-title">Break Even Calculator</div>
+            <div class="tc-desc">Find the minimum miles and rate needed to cover your costs.</div>
+            <div class="tc-arrow">→</div>
+          </div>
+          <div class="tool-card" data-goto="financial">
+            <div class="tc-icon cyan">📅</div>
+            <div class="tc-title">Weekly Revenue Planner</div>
+            <div class="tc-desc">Project weekly and annual gross/net based on your route.</div>
+            <div class="tc-arrow">→</div>
+          </div>
+        </div>
+
+        <!-- Pro Tools -->
+        <div class="section-label">Pro Tools <span class="pro-chip">PRO</span></div>
+        <div class="tool-grid">
+          <div class="tool-card pro-tool-card" data-goto="operations" style="position:relative;">
+            <div class="tc-icon" style="background:var(--purp-dim)">📦</div>
+            <div class="tc-title">Load Profit Analyzer</div>
+            <div class="tc-desc">Full load analysis with deadhead, broker fees, and net RPM.</div>
+            <div class="tc-arrow">→</div>
+            <div class="pro-lock-overlay"><div class="lock-icon">🔒</div><span>Upgrade to Pro</span></div>
+          </div>
+          <div class="tool-card pro-tool-card" style="position:relative;">
+            <div class="tc-icon" style="background:var(--grn-dim)">🔧</div>
+            <div class="tc-title">Maintenance Tracker</div>
+            <div class="tc-desc">Annual maintenance estimates with per-mile reserve breakdown.</div>
+            <div class="tc-arrow">→</div>
+            <div class="pro-lock-overlay"><div class="lock-icon">🔒</div><span>Upgrade to Pro</span></div>
+          </div>
+          <div class="tool-card pro-tool-card" style="position:relative;">
+            <div class="tc-icon" style="background:var(--gold-dim)">📈</div>
+            <div class="tc-title">Annual Profit Projection</div>
+            <div class="tc-desc">Full year income modeling with all fixed and variable costs.</div>
+            <div class="tc-arrow">→</div>
+            <div class="pro-lock-overlay"><div class="lock-icon">🔒</div><span>Upgrade to Pro</span></div>
+          </div>
+          <div class="tool-card pro-tool-card" style="position:relative;">
+            <div class="tc-icon" style="background:var(--cyan-dim)">🚛</div>
+            <div class="tc-title">Truck Loan Calculator</div>
+            <div class="tc-desc">Monthly payments, total interest, and true cost of financing.</div>
+            <div class="tc-arrow">→</div>
+            <div class="pro-lock-overlay"><div class="lock-icon">🔒</div><span>Upgrade to Pro</span></div>
+          </div>
+          <div class="tool-card pro-tool-card" style="position:relative;">
+            <div class="tc-icon" style="background:var(--red-dim)">🧾</div>
+            <div class="tc-title">Tax Estimator</div>
+            <div class="tc-desc">Self-employment + federal + state tax estimate with quarterly dues.</div>
+            <div class="tc-arrow">→</div>
+            <div class="pro-lock-overlay"><div class="lock-icon">🔒</div><span>Upgrade to Pro</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ FINANCIAL TOOLS ═══════════ -->
+    <div class="page" data-page="financial">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Financial Tools</h1>
+          <p>Calculate fuel, costs, break-even, and weekly revenue.</p>
+        </div>
+
+        <div class="tool-subnav">
+          <button class="tool-subnav-btn active" onclick="showSubTool('fin','fuel',this)">⛽ Fuel Cost</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('fin','cpm',this)">📐 Cost/Mile</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('fin','breakeven',this)">📉 Break Even</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('fin','weekly',this)">📅 Weekly Revenue</button>
+        </div>
+
+        <!-- Fuel Cost -->
+        <div class="sub-tool active" id="fin-fuel">
+          <div class="tool-module">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon">⛽</div>
+                <div>
+                  <div class="tmh-title">Fuel Cost Calculator</div>
+                  <div class="tmh-desc">Calculate trip fuel expense including DEF</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Trip Distance (miles)</label><input type="number" id="fuel-miles" placeholder="1500"/></div>
+                <div class="form-group"><label>Truck MPG</label><input type="number" id="fuel-mpg" placeholder="6.5" step="0.1"/></div>
+                <div class="form-group"><label>Diesel Price ($/gal)</label><input type="number" id="fuel-price" placeholder="3.85" step="0.01"/></div>
+                <div class="form-group"><label>DEF Cost per Mile (¢)</label><input type="number" id="fuel-def" placeholder="2" step="0.1"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="calcFuel()">⚡ Calculate</button>
+                <button class="btn btn-ghost" onclick="resetFuel()">Reset</button>
+              </div>
+              <div class="result-panel" id="fuel-result"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost Per Mile -->
+        <div class="sub-tool" id="fin-cpm">
+          <div class="tool-module">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon">📐</div>
+                <div>
+                  <div class="tmh-title">Cost Per Mile Calculator</div>
+                  <div class="tmh-desc">Know exactly what it costs you to turn the wheels</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Total Miles Driven</label><input type="number" id="cpm-miles" placeholder="10000"/></div>
+                <div class="form-group"><label>Fuel Expense ($)</label><input type="number" id="cpm-fuel" placeholder="4200"/></div>
+                <div class="form-group"><label>Truck Payment ($)</label><input type="number" id="cpm-truck" placeholder="1500"/></div>
+                <div class="form-group"><label>Insurance ($)</label><input type="number" id="cpm-ins" placeholder="900"/></div>
+                <div class="form-group"><label>Maintenance ($)</label><input type="number" id="cpm-maint" placeholder="400"/></div>
+                <div class="form-group"><label>Permits / IFTA ($)</label><input type="number" id="cpm-permits" placeholder="250"/></div>
+                <div class="form-group"><label>Food / Per Diem ($)</label><input type="number" id="cpm-food" placeholder="300"/></div>
+                <div class="form-group"><label>Other Expenses ($)</label><input type="number" id="cpm-other" placeholder="200"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="calcCPM()">⚡ Calculate CPM</button>
+                <button class="btn btn-ghost" onclick="resetCPM()">Reset</button>
+              </div>
+              <div class="result-panel" id="cpm-result"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Break Even -->
+        <div class="sub-tool" id="fin-breakeven">
+          <div class="tool-module">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon">📉</div>
+                <div>
+                  <div class="tmh-title">Break Even Calculator</div>
+                  <div class="tmh-desc">Find your minimum profitable mileage and rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Annual Fixed Costs ($)</label><input type="number" id="be-fixed" placeholder="48000"/></div>
+                <div class="form-group"><label>Variable Cost Per Mile ($)</label><input type="number" id="be-var" placeholder="0.65" step="0.01"/></div>
+                <div class="form-group"><label>Rate Per Mile ($)</label><input type="number" id="be-rate" placeholder="2.20" step="0.01"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="calcBreakEven()">⚡ Calculate</button>
+                <button class="btn btn-ghost" onclick="resetBreakEven()">Reset</button>
+              </div>
+              <div class="result-panel" id="be-result"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Revenue -->
+        <div class="sub-tool" id="fin-weekly">
+          <div class="tool-module">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon">📅</div>
+                <div>
+                  <div class="tmh-title">Weekly Revenue Planner</div>
+                  <div class="tmh-desc">Project your weekly and annual earnings</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Miles Per Week</label><input type="number" id="wr-miles" placeholder="2500"/></div>
+                <div class="form-group"><label>Rate Per Mile ($)</label><input type="number" id="wr-rpm" placeholder="2.20" step="0.01"/></div>
+                <div class="form-group"><label>Weeks Working / Year</label><input type="number" id="wr-weeks" placeholder="50"/></div>
+                <div class="form-group"><label>Fuel CPM ($)</label><input type="number" id="wr-fuel-cpm" placeholder="0.58" step="0.01"/></div>
+                <div class="form-group"><label>Other Expenses CPM ($)</label><input type="number" id="wr-other-cpm" placeholder="0.25" step="0.01"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="calcWeekly()">⚡ Calculate</button>
+                <button class="btn btn-ghost" onclick="resetWeekly()">Reset</button>
+              </div>
+              <div class="result-panel" id="wr-result"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ OPERATIONS TOOLS ═══════════ -->
+    <div class="page" data-page="operations">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Operations Tools</h1>
+          <p>Trip planning, load analysis, and route profitability.</p>
+        </div>
+
+        <div class="tool-subnav">
+          <button class="tool-subnav-btn active" onclick="showSubTool('ops','trip',this)">🗺️ Trip Planner</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('ops','loadprofit',this)">📦 Load Profit <span class="pro-chip">PRO</span></button>
+        </div>
+
+        <!-- Trip Planner -->
+        <div class="sub-tool active" id="ops-trip">
+          <div class="tool-module">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon">🗺️</div>
+                <div>
+                  <div class="tmh-title">Trip Cost &amp; Profit Calculator</div>
+                  <div class="tmh-desc">Full breakdown: fuel, tolls, food, hotel vs. load rate</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Trip Miles</label><input type="number" id="trip-miles" placeholder="1200"/></div>
+                <div class="form-group"><label>MPG</label><input type="number" id="trip-mpg" placeholder="6.5" step="0.1"/></div>
+                <div class="form-group"><label>Fuel Price ($/gal)</label><input type="number" id="trip-fuelp" placeholder="3.85" step="0.01"/></div>
+                <div class="form-group"><label>Load Rate ($)</label><input type="number" id="trip-rate" placeholder="2400"/></div>
+                <div class="form-group"><label>Toll Costs ($)</label><input type="number" id="trip-tolls" placeholder="0"/></div>
+                <div class="form-group"><label>Food / Per Diem ($)</label><input type="number" id="trip-food" placeholder="60"/></div>
+                <div class="form-group"><label>Hotel ($)</label><input type="number" id="trip-hotel" placeholder="0"/></div>
+                <div class="form-group"><label>Other Costs ($)</label><input type="number" id="trip-other" placeholder="0"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="calcTrip()">⚡ Analyze Trip</button>
+                <button class="btn btn-ghost" onclick="resetTrip()">Reset</button>
+              </div>
+              <div class="result-panel" id="trip-result"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load Profit (PRO) -->
+        <div class="sub-tool" id="ops-loadprofit">
+          <div class="tool-module" style="position:relative;overflow:hidden">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon" style="background:var(--purp-dim);border-color:var(--purp-dim)">📦</div>
+                <div>
+                  <div class="tmh-title">Load Profit Analyzer <span class="pro-chip">PRO</span></div>
+                  <div class="tmh-desc">Net RPM after deadhead, broker fees, and driver pay</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body" id="loadprofit-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Load Rate ($)</label><input type="number" id="lp-rate" placeholder="2500"/></div>
+                <div class="form-group"><label>Loaded Miles</label><input type="number" id="lp-miles" placeholder="1100"/></div>
+                <div class="form-group"><label>MPG</label><input type="number" id="lp-mpg" placeholder="6.5" step="0.1"/></div>
+                <div class="form-group"><label>Fuel Price ($/gal)</label><input type="number" id="lp-fuel" placeholder="3.85" step="0.01"/></div>
+                <div class="form-group"><label>Deadhead Miles</label><input type="number" id="lp-dead" placeholder="0"/></div>
+                <div class="form-group"><label>Broker Fee (%)</label><input type="number" id="lp-broker" placeholder="0" step="0.5"/></div>
+                <div class="form-group"><label>Tolls ($)</label><input type="number" id="lp-tolls" placeholder="0"/></div>
+                <div class="form-group"><label>Driver Pay ($)</label><input type="number" id="lp-driver" placeholder="0"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="runProTool('calcLoadProfit')">⚡ Analyze Load</button>
+                <button class="btn btn-ghost" onclick="resetLoadProfit()">Reset</button>
+              </div>
+              <div class="result-panel" id="lp-result"></div>
+            </div>
+            <div class="pro-gate-overlay" id="loadprofit-gate">
+              <div class="lock-icon" style="font-size:3rem;margin-bottom:.8rem">🔒</div>
+              <div style="font-family:var(--f-display);font-size:1.2rem;font-weight:800;color:var(--t1);margin-bottom:.4rem">Pro Feature</div>
+              <div style="font-family:var(--f-mono);font-size:.75rem;color:var(--t2);margin-bottom:1.2rem;max-width:280px;text-align:center;line-height:1.6">Upgrade to RigOps Pro to unlock Load Profit Analyzer and 4 more premium tools.</div>
+              <button class="btn btn-primary" onclick="Nav.go('upgrade')">Upgrade to Pro — $9/mo</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ BUSINESS TOOLS ═══════════ -->
+    <div class="page" data-page="business">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Business Tools <span class="pro-chip">PRO</span></h1>
+          <p>Owner-operator financial planning, loan analysis, and tax estimation.</p>
+        </div>
+
+        <div class="tool-subnav">
+          <button class="tool-subnav-btn active" onclick="showSubTool('biz','maint',this)">🔧 Maintenance</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('biz','annual',this)">📈 Annual Profit</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('biz','loan',this)">🚛 Truck Loan</button>
+          <button class="tool-subnav-btn" onclick="showSubTool('biz','tax',this)">🧾 Tax Estimator</button>
+        </div>
+
+        <!-- Maintenance Cost Tracker -->
+        <div class="sub-tool active" id="biz-maint">
+          <div class="tool-module" style="position:relative;overflow:hidden">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon" style="background:var(--grn-dim);border-color:var(--grn-dim)">🔧</div>
+                <div>
+                  <div class="tmh-title">Maintenance Cost Estimator</div>
+                  <div class="tmh-desc">Annual breakdown and per-mile reserve fund calculation</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Annual Miles Driven</label><input type="number" id="mt-miles" placeholder="120000"/></div>
+                <div class="form-group"><label>Oil / Fluids ($/yr)</label><input type="number" id="mt-oil" placeholder="700"/></div>
+                <div class="form-group"><label>Tires ($/yr)</label><input type="number" id="mt-tires" placeholder="4000"/></div>
+                <div class="form-group"><label>Brakes ($/yr)</label><input type="number" id="mt-brakes" placeholder="1200"/></div>
+                <div class="form-group"><label>Engine / Trans ($/yr)</label><input type="number" id="mt-engine" placeholder="2500"/></div>
+                <div class="form-group"><label>Trailer ($/yr)</label><input type="number" id="mt-trailer" placeholder="1000"/></div>
+                <div class="form-group"><label>Other ($/yr)</label><input type="number" id="mt-other" placeholder="500"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="runProTool('calcMaintenance')">⚡ Calculate</button>
+                <button class="btn btn-ghost" onclick="resetMaintenance()">Reset</button>
+              </div>
+              <div class="result-panel" id="mt-result"></div>
+            </div>
+            <div class="pro-gate-overlay" id="maint-gate"></div>
+          </div>
+        </div>
+
+        <!-- Annual Profit Projection -->
+        <div class="sub-tool" id="biz-annual">
+          <div class="tool-module" style="position:relative;overflow:hidden">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon" style="background:var(--gold-dim)">📈</div>
+                <div>
+                  <div class="tmh-title">Annual Profit Projection</div>
+                  <div class="tmh-desc">Full year net income modeling for owner-operators</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Weeks Working / Year</label><input type="number" id="ap-weeks" placeholder="50"/></div>
+                <div class="form-group"><label>Miles Per Week</label><input type="number" id="ap-miles" placeholder="2500"/></div>
+                <div class="form-group"><label>Rate Per Mile ($)</label><input type="number" id="ap-rpm" placeholder="2.20" step="0.01"/></div>
+                <div class="form-group"><label>Fuel CPM ($)</label><input type="number" id="ap-fuel" placeholder="0.58" step="0.01"/></div>
+                <div class="form-group"><label>Truck Payment ($/mo)</label><input type="number" id="ap-truck" placeholder="1500"/></div>
+                <div class="form-group"><label>Insurance ($/mo)</label><input type="number" id="ap-ins" placeholder="900"/></div>
+                <div class="form-group"><label>Permits ($/mo)</label><input type="number" id="ap-permits" placeholder="250"/></div>
+                <div class="form-group"><label>Health Insurance ($/mo)</label><input type="number" id="ap-health" placeholder="400"/></div>
+                <div class="form-group"><label>Other Fixed ($/mo)</label><input type="number" id="ap-other" placeholder="300"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="runProTool('calcAnnualProfit')">⚡ Project Income</button>
+                <button class="btn btn-ghost" onclick="resetAnnualProfit()">Reset</button>
+              </div>
+              <div class="result-panel" id="ap-result"></div>
+            </div>
+            <div class="pro-gate-overlay" id="annual-gate"></div>
+          </div>
+        </div>
+
+        <!-- Truck Loan -->
+        <div class="sub-tool" id="biz-loan">
+          <div class="tool-module" style="position:relative;overflow:hidden">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon" style="background:var(--cyan-dim);border-color:var(--cyan-dim)">🚛</div>
+                <div>
+                  <div class="tmh-title">Truck Loan Calculator</div>
+                  <div class="tmh-desc">Monthly payments, total interest, and true financing cost</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Truck Price ($)</label><input type="number" id="tl-price" placeholder="85000"/></div>
+                <div class="form-group"><label>Down Payment ($)</label><input type="number" id="tl-down" placeholder="10000"/></div>
+                <div class="form-group"><label>Annual Interest Rate (%)</label><input type="number" id="tl-rate" placeholder="8" step="0.25"/></div>
+                <div class="form-group"><label>Loan Term (months)</label><input type="number" id="tl-months" placeholder="60"/></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="runProTool('calcTruckLoan')">⚡ Calculate Loan</button>
+                <button class="btn btn-ghost" onclick="resetTruckLoan()">Reset</button>
+              </div>
+              <div class="result-panel" id="tl-result"></div>
+            </div>
+            <div class="pro-gate-overlay" id="loan-gate"></div>
+          </div>
+        </div>
+
+        <!-- Tax Estimator -->
+        <div class="sub-tool" id="biz-tax">
+          <div class="tool-module" style="position:relative;overflow:hidden">
+            <div class="tool-module-head">
+              <div class="tmh-left">
+                <div class="tmh-icon" style="background:var(--red-dim);border-color:var(--red-dim)">🧾</div>
+                <div>
+                  <div class="tmh-title">Tax Estimator for Owner-Operators</div>
+                  <div class="tmh-desc">Self-employment + federal + state estimate with quarterly dues</div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-module-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Gross Annual Income ($)</label><input type="number" id="tax-gross" placeholder="120000"/></div>
+                <div class="form-group"><label>Business Deductions ($)</label><input type="number" id="tax-expenses" placeholder="55000"/></div>
+                <div class="form-group">
+                  <label>State</label>
+                  <select id="tax-state">
+                    <option value="TX">Texas (0%)</option>
+                    <option value="FL">Florida (0%)</option>
+                    <option value="WA">Washington (0%)</option>
+                    <option value="NV">Nevada (0%)</option>
+                    <option value="CA">California (9.3%)</option>
+                    <option value="NY">New York (6.85%)</option>
+                    <option value="IL">Illinois (4.95%)</option>
+                    <option value="PA">Pennsylvania (3.07%)</option>
+                    <option value="OH">Ohio (4%)</option>
+                    <option value="GA">Georgia (5.5%)</option>
+                    <option value="TN">Tennessee (1%)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="runProTool('calcTax')">⚡ Estimate Tax</button>
+                <button class="btn btn-ghost" onclick="resetTax()">Reset</button>
+              </div>
+              <div class="result-panel" id="tax-result"></div>
+            </div>
+            <div class="pro-gate-overlay" id="tax-gate"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ SAVED DATA ═══════════ -->
+    <div class="page" data-page="saved">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Saved Calculations</h1>
+          <p>Your full calculation history — up to 50 entries per account.</p>
+        </div>
+        <div class="saved-actions">
+          <button class="btn btn-danger btn-sm" onclick="clearAllHistory()">Clear All History</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);overflow:hidden">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Tool</th>
+                  <th>Result</th>
+                  <th>Inputs</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="5" style="text-align:center;color:var(--t3);padding:2.5rem">No history yet. Run a tool to start saving.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ UPGRADE ═══════════ -->
+    <div class="page" data-page="upgrade">
+      <div class="page-inner" style="padding:2rem">
+        <div class="upgrade-hero">
+          <h1>Unlock <span>RigOps Pro</span></h1>
+          <p>Everything a serious owner-operator needs to maximize profit and minimize surprises.</p>
+        </div>
+
+        <div class="plan-cards">
+          <!-- Free -->
+          <div class="plan-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">$0<span>/mo</span></div>
+            <div class="plan-billing">Forever free</div>
+            <ul class="plan-features">
+              <li><span class="feat-check">✓</span> Fuel Cost Calculator</li>
+              <li><span class="feat-check">✓</span> Cost Per Mile Calculator</li>
+              <li><span class="feat-check">✓</span> Trip Mileage Calculator</li>
+              <li><span class="feat-check">✓</span> Break Even Calculator</li>
+              <li><span class="feat-check">✓</span> Weekly Revenue Planner</li>
+              <li><span class="feat-cross">✗</span> Load Profit Analyzer</li>
+              <li><span class="feat-cross">✗</span> Maintenance Tracker</li>
+              <li><span class="feat-cross">✗</span> Annual Profit Projection</li>
+              <li><span class="feat-cross">✗</span> Truck Loan Calculator</li>
+              <li><span class="feat-cross">✗</span> Tax Estimator</li>
+              <li><span class="feat-cross">✗</span> Calculation History</li>
+            </ul>
+            <button class="btn btn-ghost" style="width:100%" disabled>Current Plan</button>
+          </div>
+
+          <!-- Pro Monthly -->
+          <div class="plan-card featured">
+            <div class="plan-popular">Most Popular</div>
+            <div class="plan-name">RigOps Pro</div>
+            <div class="plan-price gold-price">$9<span>/mo</span></div>
+            <div class="plan-billing">Billed monthly · Cancel anytime</div>
+            <ul class="plan-features">
+              <li><span class="feat-check">✓</span> All 5 Free Tools</li>
+              <li><span class="feat-check">✓</span> Load Profit Analyzer</li>
+              <li><span class="feat-check">✓</span> Maintenance Cost Tracker</li>
+              <li><span class="feat-check">✓</span> Annual Profit Projection</li>
+              <li><span class="feat-check">✓</span> Truck Loan Calculator</li>
+              <li><span class="feat-check">✓</span> Tax Estimator (O/O)</li>
+              <li><span class="feat-check">✓</span> Save 50 Calculations</li>
+              <li><span class="feat-check">✓</span> Calculation History</li>
+              <li><span class="feat-check">✓</span> Priority Support</li>
+            </ul>
+            <div class="stripe-btn-wrap">
+              <!-- Replace with your Stripe payment link -->
+              <button class="btn btn-primary" style="width:100%" onclick="handleUpgrade('monthly')">
+                ⚡ Upgrade Now — $9/mo
+              </button>
+              <div class="stripe-divider">or</div>
+              <button class="btn btn-gold-outline" style="width:100%" onclick="handleUpgrade('annual')">
+                Save 54% — $49/year
+              </button>
+            </div>
+          </div>
+
+          <!-- Pro Annual -->
+          <div class="plan-card">
+            <div class="plan-name">Pro Annual</div>
+            <div class="plan-price gold-price">$49<span>/yr</span></div>
+            <div class="plan-billing">$4.08/mo · Save $59 vs monthly</div>
+            <ul class="plan-features">
+              <li><span class="feat-check">✓</span> Everything in Pro</li>
+              <li><span class="feat-check">✓</span> 2 months free</li>
+              <li><span class="feat-check">✓</span> Best value</li>
+            </ul>
+            <button class="btn btn-gold-outline" style="width:100%" onclick="handleUpgrade('annual')">
+              Get Annual — $49/yr
+            </button>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--b1);border-radius:var(--r-lg);padding:1.5rem;margin-top:1rem">
+          <div class="section-label" style="margin-bottom:1rem">Why RigOps Pro?</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem">
+            <div style="display:flex;gap:.75rem;align-items:flex-start">
+              <div style="font-size:1.5rem;flex-shrink:0">💡</div>
+              <div>
+                <div style="font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:.2rem">Know Your Real Numbers</div>
+                <div style="font-size:.78rem;color:var(--t2);line-height:1.6">Stop guessing your profit. Run real calculations before accepting any load.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.75rem;align-items:flex-start">
+              <div style="font-size:1.5rem;flex-shrink:0">🧾</div>
+              <div>
+                <div style="font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:.2rem">Tax Season Ready</div>
+                <div style="font-size:.78rem;color:var(--t2);line-height:1.6">Estimate quarterly taxes so you're never caught short on April 15.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.75rem;align-items:flex-start">
+              <div style="font-size:1.5rem;flex-shrink:0">🔧</div>
+              <div>
+                <div style="font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:.2rem">Protect Your Equipment</div>
+                <div style="font-size:.78rem;color:var(--t2);line-height:1.6">Know your maintenance cost per mile and budget your reserve fund correctly.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.75rem;align-items:flex-start">
+              <div style="font-size:1.5rem;flex-shrink:0">📦</div>
+              <div>
+                <div style="font-family:var(--f-display);font-weight:700;font-size:.95rem;margin-bottom:.2rem">Analyze Every Load</div>
+                <div style="font-size:.78rem;color:var(--t2);line-height:1.6">Factor in broker fees, deadhead, and driver pay before you accept.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ SETTINGS ═══════════ -->
+    <div class="page" data-page="settings">
+      <div class="page-inner" style="padding:2rem">
+        <div class="page-header">
+          <h1>Settings</h1>
+          <p>Manage your account and preferences.</p>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Account</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Name</div>
+              <div class="settings-row-sub" id="settings-name">—</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Email</div>
+              <div class="settings-row-sub" id="settings-email">—</div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Plan</div>
+              <div class="settings-row-sub" id="settings-plan">Free</div>
+            </div>
+            <button class="btn btn-gold-outline btn-sm" onclick="Nav.go('upgrade')">Upgrade</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Account created</div>
+              <div class="settings-row-sub" id="settings-created">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Data</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Calculation History</div>
+              <div class="settings-row-sub">Stored locally in your browser</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="clearAllHistory()">Clear History</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Session</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label">Sign Out</div>
+              <div class="settings-row-sub">Ends your current session</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Pro Gate Overlay Template (injected by JS into pro tool containers) -->
+<style>
+.pro-gate-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(6,8,13,.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 10;
+}
+</style>
+
+<!-- Upgrade Modal (shown from locked tool cards on dashboard) -->
+<div class="modal-backdrop" id="upgrade-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
+    <div style="font-size:2rem;margin-bottom:.8rem">⚡</div>
+    <h2>Upgrade to RigOps Pro</h2>
+    <p>This tool is available on the Pro plan. Unlock all 5 premium tools, calculation history, and more for just $9/month.</p>
+    <div class="btn-row" style="flex-direction:column;gap:.65rem">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="handleUpgrade('monthly')">Get Pro — $9/month</button>
+      <button class="btn btn-gold-outline" style="width:100%;justify-content:center" onclick="handleUpgrade('annual')">Best Value — $49/year (save 54%)</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="closeUpgradeModal()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="auth/auth.js"></script>
+<script src="scripts/tools.js"></script>
+<script src="scripts/app.js"></script>
+<script>
+  /* ── Sub-tool switcher ── */
+  function showSubTool(group, tool, btn) {
+    document.querySelectorAll('#' + group + '-' + tool).length ||
+    document.querySelectorAll('[id^="' + group + '-"]').forEach(el => el.classList.remove('active'));
+
+    const parent = btn.closest('.tool-subnav').nextElementSibling?.parentElement ||
+                   btn.closest('.page-inner');
+    parent.querySelectorAll('.sub-tool').forEach(el => el.classList.remove('active'));
+    parent.querySelectorAll('.tool-subnav-btn').forEach(b => b.classList.remove('active'));
+
+    const target = document.getElementById(group + '-' + tool);
+    if (target) target.classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── Pro tool gate ── */
+  function runProTool(fnName) {
+    if (!Auth.isPro()) {
+      openUpgradeModal();
+      return;
+    }
+    window[fnName]?.();
+  }
+
+  /* ── Render settings page ── */
+  function renderSettings() {
+    const user = Auth.getSession();
+    if (!user) return;
+    const el = id => document.getElementById(id);
+    if (el('settings-name'))    el('settings-name').textContent    = user.name;
+    if (el('settings-email'))   el('settings-email').textContent   = user.email;
+    if (el('settings-plan'))    el('settings-plan').textContent    = user.plan === 'pro' ? 'RigOps Pro ✓' : 'Free';
+    if (el('settings-created')) el('settings-created').textContent = new Date(user.created).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  }
+
+  /* ── Pro gates on business page ── */
+  function setupProGates() {
+    const gateIds = ['maint-gate','annual-gate','loan-gate','tax-gate','loadprofit-gate'];
+    gateIds.forEach(id => {
+      const gate = document.getElementById(id);
+      if (!gate) return;
+      if (Auth.isPro()) {
+        gate.remove();
+      } else {
+        gate.innerHTML = `
+          <div style="font-size:2.5rem;margin-bottom:.7rem">🔒</div>
+          <div style="font-family:var(--f-display);font-size:1.1rem;font-weight:800;color:var(--t1);margin-bottom:.4rem">Pro Feature</div>
+          <div style="font-family:var(--f-mono);font-size:.72rem;color:var(--t2);margin-bottom:1.1rem;max-width:260px;text-align:center;line-height:1.6">Upgrade to unlock this tool and 4 more premium calculators.</div>
+          <button class="btn btn-primary" onclick="Nav.go('upgrade')">Upgrade to Pro — $9/mo</button>`;
+      }
+    });
+  }
+
+  // Hook settings page
+  document.querySelector('[data-nav="settings"]')?.addEventListener('click', renderSettings);
+
+  // Setup gates after auth check
+  document.addEventListener('DOMContentLoaded', () => {
+    setupProGates();
+    renderSettings();
+  });
+</script>
+</body>
+</html>
